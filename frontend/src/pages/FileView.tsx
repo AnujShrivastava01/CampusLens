@@ -192,10 +192,12 @@ const FileView = () => {
   if (!isLoaded) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading...</p>
+            </div>
           </div>
         </div>
       </Layout>
@@ -206,22 +208,24 @@ const FileView = () => {
   if (!isSignedIn) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Card className="p-8 text-center max-w-md">
-            <FileSpreadsheet className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">Sign In Required</h3>
-            <p className="text-gray-600 mb-6">
-              Please sign in to view file data.
-            </p>
-            <div className="space-x-2">
-              <SignInButton mode="modal">
-                <Button>Sign In</Button>
-              </SignInButton>
-              <SignUpButton mode="modal">
-                <Button variant="outline">Sign Up</Button>
-              </SignUpButton>
-            </div>
-          </Card>
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Card className="p-8 text-center max-w-md">
+              <FileSpreadsheet className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Sign In Required</h3>
+              <p className="text-gray-600 mb-6">
+                Please sign in to view file data.
+              </p>
+              <div className="space-x-2">
+                <SignInButton mode="modal">
+                  <Button>Sign In</Button>
+                </SignInButton>
+                <SignUpButton mode="modal">
+                  <Button variant="outline">Sign Up</Button>
+                </SignUpButton>
+              </div>
+            </Card>
+          </div>
         </div>
       </Layout>
     );
@@ -231,8 +235,10 @@ const FileView = () => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+          </div>
         </div>
       </Layout>
     );
@@ -241,18 +247,20 @@ const FileView = () => {
   if (error || !fileData) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Card className="p-6 text-center">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Error Loading File</h3>
-            <p className="text-gray-600 mb-4">{error || 'File not found'}</p>
-            <div className="space-x-2">
-              <Button onClick={fetchFileData}>Retry</Button>
-              <Button variant="outline" onClick={() => navigate('/files')}>
-                Back to Files
-              </Button>
-            </div>
-          </Card>
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Card className="p-6 text-center">
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Error Loading File</h3>
+              <p className="text-gray-600 mb-4">{error || 'File not found'}</p>
+              <div className="space-x-2">
+                <Button onClick={fetchFileData}>Retry</Button>
+                <Button variant="outline" onClick={() => navigate('/files')}>
+                  Back to Files
+                </Button>
+              </div>
+            </Card>
+          </div>
         </div>
       </Layout>
     );
@@ -262,20 +270,22 @@ const FileView = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={() => navigate('/files')}>
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              Back to Files
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-full flex items-center justify-start">
+              <Button variant="outline" onClick={() => navigate('/files')}>
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Back to Files
+              </Button>
+            </div>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center">
                 <FileSpreadsheet className="w-8 h-8 mr-3 text-green-600" />
                 {file.filename}
               </h1>
-              <div className="flex items-center space-x-4 mt-2">
+              <div className="flex items-center justify-center space-x-4 mt-2">
                 {getStatusBadge(file.status)}
                 <span className="text-sm text-gray-500">
                   {file.totalRecords} total • {file.processedRecords} processed
@@ -284,10 +294,9 @@ const FileView = () => {
               </div>
             </div>
           </div>
-        </div>
 
         {/* Filters and Search */}
-        <Card>
+        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="flex items-center">
               <Filter className="w-5 h-5 mr-2" />
@@ -355,7 +364,7 @@ const FileView = () => {
         </Card>
 
         {/* Data Table */}
-        <Card>
+        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>Student Data ({pagination.total} records)</CardTitle>
@@ -392,13 +401,12 @@ const FileView = () => {
                         {header}
                       </TableHead>
                     ))}
-                    <TableHead>Row #</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {!students || students.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={(file?.headers?.length || 0) + 1} className="text-center py-8">
+                      <TableCell colSpan={file?.headers?.length || 0} className="text-center py-8">
                         {isLoading ? 'Loading data...' : 'No data found matching your criteria'}
                       </TableCell>
                     </TableRow>
@@ -410,9 +418,6 @@ const FileView = () => {
                             {renderCellValue(student._rawData?.[header] || student[header as keyof Student])}
                           </TableCell>
                         ))}
-                        <TableCell className="text-gray-500">
-                          {student.rowNumber || '-'}
-                        </TableCell>
                       </TableRow>
                     ))
                   )}
@@ -455,6 +460,7 @@ const FileView = () => {
             )}
           </CardContent>
         </Card>
+        </div>
       </div>
     </Layout>
   );

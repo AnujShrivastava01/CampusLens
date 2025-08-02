@@ -121,7 +121,7 @@ const Dashboard = () => {
   if (!isSignedIn) {
     return (
       <Layout>
-        <div className="space-y-8">
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -148,7 +148,7 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="space-y-8">
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -178,7 +178,7 @@ const Dashboard = () => {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <Card className="glass-card">
+            <Card className="glass-card p-6">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
                   <Users className="h-6 w-6 text-white" />
@@ -192,7 +192,7 @@ const Dashboard = () => {
               </div>
             </Card>
 
-            <Card className="glass-card">
+            <Card className="glass-card p-6">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
                   <FileSpreadsheet className="h-6 w-6 text-white" />
@@ -206,7 +206,7 @@ const Dashboard = () => {
               </div>
             </Card>
 
-            <Card className="glass-card">
+            <Card className="glass-card p-6">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-500 rounded-lg flex items-center justify-center">
                   <Calendar className="h-6 w-6 text-white" />
@@ -228,8 +228,8 @@ const Dashboard = () => {
           </div>
 
           {/* Main Content Area */}
-          <Card className="glass-card">
-            <div className="text-center py-20">
+          <Card className="glass-card p-8 mb-8">
+            <div className="text-center py-12">
               <div className="w-24 h-24 bg-gradient-primary rounded-full mx-auto mb-6 flex items-center justify-center">
                 <Upload className="h-12 w-12 text-primary-foreground" />
               </div>
@@ -273,26 +273,17 @@ const Dashboard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mt-12"
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold">Recent Activity</h2>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setIsUploadModalOpen(true)}
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Upload New File
-              </Button>
             </div>
-            <div className="bg-card rounded-lg border p-6">
+            <Card className="p-6">
               <p className="text-muted-foreground text-center py-8">
                 {stats?.uploadStats?.lastUpload && stats.uploadStats.lastUpload !== 'Never'
                   ? `Last upload: ${formatDate(stats.uploadStats.lastUpload)}`
                   : 'No recent uploads'}
               </p>
-            </div>
+            </Card>
           </motion.div>
         </motion.div>
       </div>
