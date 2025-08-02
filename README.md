@@ -2,6 +2,21 @@
 
 A full-stack web application for managing student data with Excel integration and real-time filtering capabilities.
 
+## 🚨 **IMPORTANT: Environment Setup**
+
+### **Backend Environment Variables**
+1. Copy `backend/.env.example` to `backend/.env`
+2. Fill in your actual credentials:
+   - **MongoDB URI**: Get from [MongoDB Atlas](https://cloud.mongodb.com/)
+   - **Clerk Secret Key**: Get from [Clerk Dashboard](https://dashboard.clerk.com/)
+
+### **Frontend Environment Variables**
+1. Copy `frontend/.env.example` to `frontend/.env`
+2. Fill in your actual credentials:
+   - **Clerk Publishable Key**: Get from [Clerk Dashboard](https://dashboard.clerk.com/)
+
+⚠️ **Never commit `.env` files to Git!** They contain sensitive credentials.
+
 ## 🏗️ Project Structure
 
 ```
