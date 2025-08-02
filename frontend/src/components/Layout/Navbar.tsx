@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { MoonIcon, SunIcon, Upload } from "lucide-react";
+import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadsheet } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { Link, useLocation } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
@@ -39,6 +41,12 @@ const Navbar = () => {
               CampusLens
             </span>
           </motion.div>
+
+                  {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-1">
+            <NavLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
+            <NavLink to="/files" icon={FileSpreadsheet} label="Files" />
+          </div>
 
           {/* Right Section */}
           <div className="flex items-center space-x-4">
@@ -87,6 +95,27 @@ const Navbar = () => {
         </div>
       </div>
     </motion.nav>
+  );
+};
+
+// Navigation Link Component
+const NavLink = ({ to, icon: Icon, label }: { to: string; icon: any; label: string }) => {
+  const location = useLocation();
+  const isActive = location.pathname === to;
+  
+  return (
+    <Link
+      to={to}
+      className={cn(
+        "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
+        isActive
+          ? "bg-accent text-accent-foreground"
+          : "text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground"
+      )}
+    >
+      <Icon className="h-4 w-4 mr-2" />
+      {label}
+    </Link>
   );
 };
 

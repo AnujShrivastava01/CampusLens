@@ -1,143 +1,102 @@
 import mongoose from 'mongoose';
 
 const studentSchema = new mongoose.Schema({
-  // Basic Information
+  // Common fields (will be auto-populated if matching headers are found)
   studentId: {
     type: String,
-    required: true,
-    unique: true,
-    trim: true
+    trim: true,
+    sparse: true
   },
   firstName: {
     type: String,
-    required: true,
     trim: true
   },
   lastName: {
     type: String,
-    required: true,
     trim: true
   },
   email: {
     type: String,
-    required: true,
-    unique: true,
     lowercase: true,
     trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
+    sparse: true  // Allow multiple null values
   },
   phone: {
     type: String,
     trim: true
   },
-  dateOfBirth: {
-    type: Date
-  },
-  
-  // Academic Information
-  program: {
+  branch: {
     type: String,
-    required: true,
-    trim: true
-  },
-  year: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 6
-  },
-  semester: {
-    type: String,
-    enum: ['Fall', 'Spring', 'Summer'],
-    required: true
-  },
-  gpa: {
-    type: Number,
-    min: 0,
-    max: 4.0
-  },
-  credits: {
-    type: Number,
-    default: 0
+    trim: true,
+    index: true
   },
   
-  // Contact Information
-  address: {
-    street: String,
-    city: String,
-    state: String,
-    zipCode: String,
-    country: String
-  },
-  
-  // Emergency Contact
-  emergencyContact: {
-    name: String,
-    relationship: String,
-    phone: String,
-    email: String
-  },
-  
-  // Academic Status
-  status: {
-    type: String,
-    enum: ['Active', 'Inactive', 'Graduated', 'Suspended', 'Withdrawn'],
-    default: 'Active'
-  },
-  
-  // Courses (references to Course model if you create one later)
-  courses: [{
-    courseId: String,
-    courseName: String,
-    grade: String,
-    credits: Number,
-    semester: String,
-    year: Number
-  }],
-  
-  // Additional Data (for Excel imports with custom fields)
-  customFields: {
-    type: Map,
-    of: mongoose.Schema.Types.Mixed
+  // Raw data storage for all columns
+  _rawData: {
+    type: mongoose.Schema.Types.Mixed,
+    default: {}
   },
   
   // Metadata
-  createdBy: {
-    type: String, // Clerk user ID
+  uploadId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'FileUpload',
+    index: true
+  },
+  rowNumber: {
+    type: Number,
     required: true
   },
-  updatedBy: {
-    type: String // Clerk user ID
+  createdBy: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
-}, {
-  timestamps: true, // Adds createdAt and updatedAt
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
+}, { timestamps: true });
 
-// Virtual for full name
-studentSchema.virtual('fullName').get(function() {
-  return `${this.firstName} ${this.lastName}`;
-});
+// Create a text index on _rawData for searching
+studentSchema.index({ '_rawData.$**': 'text' });
 
-// Index for better search performance
-studentSchema.index({ studentId: 1 });
-studentSchema.index({ email: 1 });
-studentSchema.index({ firstName: 1, lastName: 1 });
-studentSchema.index({ program: 1, year: 1 });
-studentSchema.index({ createdBy: 1 });
-
-// Pre-save middleware
+// Add a pre-save hook to update the updatedAt field
 studentSchema.pre('save', function(next) {
-  // Capitalize first letter of names
-  if (this.firstName) {
-    this.firstName = this.firstName.charAt(0).toUpperCase() + this.firstName.slice(1).toLowerCase();
-  }
-  if (this.lastName) {
-    this.lastName = this.lastName.charAt(0).toUpperCase() + this.lastName.slice(1).toLowerCase();
-  }
+  this.updatedAt = new Date();
   next();
 });
+
+// Add a method to get all unique field names across documents
+studentSchema.statics.getFieldNames = async function() {
+  const fields = new Set();
+  
+  // Get all documents and collect field names
+  const docs = await this.find({}).lean();
+  docs.forEach(doc => {
+    if (doc._rawData) {
+      Object.keys(doc._rawData).forEach(field => fields.add(field));
+    }
+  });
+  
+  return Array.from(fields);
+};
+
+// Add a method to search across all fields
+studentSchema.statics.search = async function(query, filters = {}) {
+  const searchQuery = {
+    $or: [
+      { $text: { $search: query } },
+      { '_rawData.$**': { $regex: query, $options: 'i' } }
+    ],
+    ...filters
+  };
+  
+  return this.find(searchQuery);
+};
 
 const Student = mongoose.model('Student', studentSchema);
 
