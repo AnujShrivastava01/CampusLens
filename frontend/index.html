@@ -3,25 +3,75 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CampusLens</title>
+    <title>CampusLens - Student Data Management</title>
     <meta name="description" content="Upload, manage, and analyze student data with powerful Excel integration and real-time filtering capabilities." />
     <meta name="author" content="CampusLens" />
     
-    <!-- Favicon -->
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#3b82f6" />
+    <meta name="background-color" content="#ffffff" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="CampusLens" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Icons for all platforms -->
     <link rel="icon" type="image/png" href="/logo1.png" />
     <link rel="shortcut icon" type="image/png" href="/logo1.png" />
     <link rel="apple-touch-icon" href="/logo1.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/logo2.png" />
+    <link rel="apple-touch-icon" sizes="512x512" href="/logo3.png" />
+    
+    <!-- Apple PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CampusLens" />
+    
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileImage" content="/logo1.png" />
+    <meta name="msapplication-TileColor" content="#3b82f6" />
+    <meta name="msapplication-navbutton-color" content="#3b82f6" />
+    <meta name="msapplication-starturl" content="/" />
+    
+    <!-- Open Graph Tags for Social Sharing & Install Preview -->
+    <meta property="og:title" content="CampusLens - Student Data Management" />
+    <meta property="og:description" content="Upload, manage, and analyze student data with powerful Excel integration and real-time filtering capabilities." />
+    <meta property="og:image" content="/preview-desktop.png" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:url" content="https://campuslens.vercel.app" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CampusLens" />
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CampusLens - Student Data Management" />
+    <meta name="twitter:description" content="Upload, manage, and analyze student data with powerful Excel integration and real-time filtering capabilities." />
+    <meta name="twitter:image" content="/preview-desktop.png" />
+    <meta name="twitter:image:alt" content="CampusLens Dashboard Preview" />
+    
+    <!-- Apple PWA Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="CampusLens" />
+    
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileImage" content="/logo1.png" />
+    <meta name="msapplication-TileColor" content="#3b82f6" />
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:title" content="CampusLens" />
+    <meta property="og:title" content="CampusLens - Student Data Management" />
     <meta property="og:description" content="Upload, manage, and analyze student data with powerful Excel integration and real-time filtering capabilities." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/logo1.png" />
-    <meta property="og:url" content="https://campuslens.netlify.app" />
+    <meta property="og:image" content="/preview-desktop.png" />
+    <meta property="og:url" content="https://campuslens.vercel.app" />
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="CampusLens" />
+    <meta name="twitter:title" content="CampusLens - Student Data Management" />
+    <meta name="twitter:description" content="Upload, manage, and analyze student data with powerful Excel integration and real-time filtering capabilities." />
+    <meta name="twitter:image" content="/preview-desktop.png" />
     <meta name="twitter:description" content="Upload, manage, and analyze student data with powerful Excel integration and real-time filtering capabilities." />
     <meta name="twitter:image" content="/logo1.png" />
   </head>
@@ -29,5 +79,20 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('SW registered: ', registration);
+            })
+            .catch((registrationError) => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
