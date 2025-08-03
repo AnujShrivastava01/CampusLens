@@ -1,0 +1,3 @@
+<!-- This is a placeholder for the desktop preview image -->
+<!-- You'll need to replace this with an actual screenshot of your dashboard -->
+<!-- Image should be 1280x720 pixels showing your CampusLens dashboard -->
