@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadsheet } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -21,38 +20,21 @@ const Navbar = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
-  // Smart navigation function for logo/heading clicks
-  const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    
-    if (location.pathname === '/') {
-      // If on landing page, smooth scroll to top
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    } else {
-      // If on other pages, navigate to landing page
-      navigate('/');
-      // The Index component will handle scrolling to top via useEffect
-    }
-  };
-
   return (
-    <motion.nav
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-50 glass-nav"
-    >
+    <nav className="fixed top-0 left-0 right-0 z-[9999] glass-nav backdrop-blur-md bg-background/80 border-b border-border/20 shadow-lg">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo Section */}
-          <motion.div
-            className="flex items-center space-x-3 cursor-pointer"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            onClick={handleLogoClick}
+          <Link 
+            to="/"
+            className="flex items-center space-x-3 cursor-pointer hover:scale-105 transition-transform duration-200"
+            onClick={(e) => {
+              // If we're already on the home page, prevent navigation and just scroll
+              if (location.pathname === "/") {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
           >
             <img 
               src="/logo1.png" 
@@ -62,7 +44,7 @@ const Navbar = () => {
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               CampusLens
             </span>
-          </motion.div>
+          </Link>
 
                   {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
@@ -80,18 +62,13 @@ const Navbar = () => {
               className="relative overflow-hidden"
             >
               {mounted && (
-                <motion.div
-                  key={theme}
-                  initial={{ rotate: -180, opacity: 0 }}
-                  animate={{ rotate: 0, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                >
+                <div className="transition-all duration-300">
                   {theme === "dark" ? (
                     <SunIcon className="h-4 w-4" />
                   ) : (
                     <MoonIcon className="h-4 w-4" />
                   )}
-                </motion.div>
+                </div>
               )}
             </Button>
 
@@ -116,7 +93,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 };
 

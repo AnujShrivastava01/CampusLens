@@ -5,8 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { ClerkProvider } from "@clerk/clerk-react";
+import { PageTransition } from "@/components/PageTransition";
+import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
+import Navbar from "@/components/Layout/Navbar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Students from "./pages/Students";
 import Files from "./pages/Files";
 import FileView from "./pages/FileView";
 import NotFound from "./pages/NotFound";
@@ -28,15 +32,18 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
+            <Navbar />
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/files" element={<Files />} />
-              <Route path="/files/:fileId" element={<FileView />} />
+              <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+              <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+              <Route path="/students" element={<PageTransition><Students /></PageTransition>} />
+              <Route path="/files" element={<PageTransition><Files /></PageTransition>} />
+              <Route path="/files/:fileId" element={<PageTransition><FileView /></PageTransition>} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
+              <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
             </Routes>
           </BrowserRouter>
+          <PWAInstallPrompt />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>

@@ -4,9 +4,9 @@ import FeaturesSection from "@/components/Home/FeaturesSection";
 import { useEffect } from "react";
 
 const Index = () => {
-  // Scroll to top when landing page loads
+  // Immediately scroll to top when landing page loads (no smooth animation for navigation)
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, []);
 
   return (
