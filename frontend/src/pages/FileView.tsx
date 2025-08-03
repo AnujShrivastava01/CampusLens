@@ -51,6 +51,8 @@ const FileView = () => {
   const [fileData, setFileData] = useState<FileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uniqueValues, setUniqueValues] = useState<Record<string, any[]>>({});
+  const [isLoadingUniqueValues, setIsLoadingUniqueValues] = useState(false);
   
   // Filter and search states
   const [search, setSearch] = useState('');
@@ -90,8 +92,6 @@ const FileView = () => {
       setIsLoading(true);
       setError(null);
       
-      console.log('Fetching data for file:', fileId); // Debug log
-      
       const response = await apiService.getFileData(fileId, {
         page: currentPage,
         limit: pageSize,
@@ -99,10 +99,7 @@ const FileView = () => {
         filters: Object.keys(filters).length > 0 ? filters : undefined,
       });
       
-      console.log('File data response:', response); // Debug log
       setFileData(response.data);
-      console.log('Headers from file:', response.data.file.headers); // Debug log
-      console.log('Students data:', response.data.students); // Debug log
     } catch (error) {
       console.error('Error fetching file data:', error);
       const errorMessage = error instanceof Error ? error.message : 'Failed to load file data';
@@ -123,18 +120,133 @@ const FileView = () => {
     }
   }, [fetchFileData, isLoaded]);
 
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (currentPage !== 1) {
-        setCurrentPage(1);
-      } else {
-        fetchFileData();
-      }
-    }, 500);
+  // Fetch unique values for filter dropdowns
+  const fetchUniqueValues = useCallback(async () => {
+    if (!fileId || !isSignedIn) {
+      return;
+    }
 
-    return () => clearTimeout(timer);
-  }, [search, filters]);
+    try {
+      setIsLoadingUniqueValues(true);
+      const response = await apiService.getFileUniqueValues(fileId);
+      
+      if (response && response.uniqueValues && Object.keys(response.uniqueValues).length > 0) {
+        setUniqueValues(response.uniqueValues);
+      } else {
+        useFallbackUniqueValues();
+      }
+    } catch (error) {
+      // Fallback: use local data from current page if API fails
+      useFallbackUniqueValues();
+      
+      toast({
+        variant: "destructive",
+        title: "Error loading filter options",
+        description: "Using fallback data from current page.",
+      });
+    } finally {
+      setIsLoadingUniqueValues(false);
+    }
+  }, [fileId, isSignedIn, toast]);
+
+  // Get filtered unique values based on current filters (dynamic filtering)
+  const getFilteredUniqueValues = useCallback((targetHeader: string) => {
+    if (!fileData?.students || Object.keys(uniqueValues).length === 0) {
+      return uniqueValues[targetHeader] || [];
+    }
+
+    // If no filters are applied, return all unique values
+    const activeFilters = Object.keys(filters).filter(key => filters[key] && key !== targetHeader);
+    if (activeFilters.length === 0) {
+      return uniqueValues[targetHeader] || [];
+    }
+
+    // Create filter object excluding the target header
+    const filtersForQuery = { ...filters };
+    delete filtersForQuery[targetHeader];
+
+    // For now, use local filtering until we can call the API efficiently
+    // In a production app, you might debounce API calls or cache results
+    const matchingRecords = fileData.students.filter(student => {
+      return activeFilters.every(filterKey => {
+        const filterValue = filters[filterKey];
+        const studentValue = student._rawData?.[filterKey] || student[filterKey as keyof Student];
+        return String(studentValue) === filterValue;
+      });
+    });
+
+    // Extract unique values for the target header from matching records
+    const filteredValues = new Set<string>();
+    matchingRecords.forEach(student => {
+      const value = student._rawData?.[targetHeader] || student[targetHeader as keyof Student];
+      if (value !== null && value !== undefined && value !== '') {
+        const stringValue = String(value).trim();
+        if (stringValue.length > 0) {
+          filteredValues.add(stringValue);
+        }
+      }
+    });
+
+    const result = Array.from(filteredValues);
+    return result;
+  }, [fileData, uniqueValues, filters]);
+
+  // Fallback function to generate unique values from current page data
+  const useFallbackUniqueValues = useCallback(() => {
+    if (fileData?.students && fileData.file?.headers) {
+      const fallbackUniqueValues: Record<string, any[]> = {};
+      
+      fileData.file.headers.forEach(header => {
+        const values = new Set<string>();
+        fileData.students.forEach(student => {
+          // Try multiple ways to get the value
+          let value = student._rawData?.[header] || student[header as keyof Student];
+          
+          // Also try common field mappings
+          if (!value && header.toLowerCase().includes('name')) {
+            value = student.firstName || student.lastName || student.fullName;
+          }
+          if (!value && header.toLowerCase().includes('department')) {
+            value = student.program;
+          }
+          
+          if (value !== null && value !== undefined && value !== '') {
+            const stringValue = String(value).trim();
+            if (stringValue.length > 0) {
+              values.add(stringValue);
+            }
+          }
+        });
+        fallbackUniqueValues[header] = Array.from(values).slice(0, 50); // Limit to 50 values
+      });
+      
+      setUniqueValues(fallbackUniqueValues);
+      
+      // Show success message
+      toast({
+        title: "Filter options loaded",
+        description: `Loaded filter options for ${Object.keys(fallbackUniqueValues).length} columns.`,
+      });
+    }
+  }, [fileData, toast]);
+
+  // Fetch unique values when component mounts or fileId changes
+  useEffect(() => {
+    if (isLoaded && fileId && isSignedIn) {
+      fetchUniqueValues();
+    }
+  }, [fetchUniqueValues, isLoaded, fileId, isSignedIn]);
+
+  // Also use fallback unique values when fileData is loaded and no unique values exist
+  useEffect(() => {
+    const hasFileData = !!fileData?.students?.length;
+    const hasNoUniqueValues = Object.keys(uniqueValues).length === 0;
+    const notCurrentlyLoading = !isLoadingUniqueValues;
+    
+    if (hasFileData && hasNoUniqueValues && notCurrentlyLoading) {
+      setTimeout(() => useFallbackUniqueValues(), 500); // Small delay to ensure data is fully loaded
+    }
+  }, [fileData, uniqueValues, isLoadingUniqueValues, useFallbackUniqueValues]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -155,6 +267,21 @@ const FileView = () => {
       } else {
         delete newFilters[header]; // Remove the filter if value is empty/undefined/ALL
       }
+      
+      // Clear dependent filters that may no longer be valid
+      // For example, if Department changes, clear Name filter if the selected name
+      // is not available in the new department
+      const remainingHeaders = file?.headers || [];
+      remainingHeaders.forEach(otherHeader => {
+        if (otherHeader !== header && newFilters[otherHeader]) {
+          // Check if the current value for this filter is still valid
+          const filteredOptions = getFilteredUniqueValues(otherHeader);
+          if (!filteredOptions.includes(newFilters[otherHeader])) {
+            delete newFilters[otherHeader];
+          }
+        }
+      });
+      
       return newFilters;
     });
   };
@@ -169,23 +296,6 @@ const FileView = () => {
     if (value === null || value === undefined) return '';
     if (typeof value === 'object') return JSON.stringify(value);
     return String(value);
-  };
-
-  const getUniqueColumnValues = (header: string): string[] => {
-    if (!fileData?.students) return [];
-    
-    const values = new Set<string>();
-    fileData.students.forEach(student => {
-      const value = student._rawData?.[header] || student[header as keyof Student];
-      if (value !== null && value !== undefined && value !== '') {
-        const stringValue = String(value).trim();
-        if (stringValue.length > 0) {
-          values.add(stringValue);
-        }
-      }
-    });
-    
-    return Array.from(values).slice(0, 10).filter(v => v && v.trim() !== ''); // Extra filtering
   };
 
   // Show loading state while Clerk is initializing
@@ -308,25 +418,55 @@ const FileView = () => {
               {/* Global Search */}
               <div className="md:col-span-2 lg:col-span-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Search className={`absolute left-3 top-3 h-4 w-4 ${debouncedSearch ? 'text-blue-500' : 'text-gray-400'}`} />
                   <Input
                     placeholder="Search all fields..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10"
+                    className={`pl-10 ${debouncedSearch ? 'border-blue-300 bg-blue-50' : ''}`}
                   />
                   {search !== debouncedSearch && (
-                    <div className="absolute right-3 top-3 h-4 w-4">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div>
+                    <div className="absolute right-8 top-3 h-4 w-4">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
                     </div>
                   )}
+                  {debouncedSearch && search === debouncedSearch && (
+                    <div className="absolute right-8 top-3 h-4 w-4 text-green-500">
+                      <CheckCircle className="h-4 w-4" />
+                    </div>
+                  )}
+                  {search && (
+                    <button
+                      onClick={() => setSearch('')}
+                      className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+                      title="Clear search"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
+                {debouncedSearch && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Searching for: "{debouncedSearch}"
+                  </p>
+                )}
               </div>
               
               {/* Column Filters */}
-              {file?.headers && file.headers.length > 0 && file.headers.slice(0, 4).map(header => {
-                const uniqueValues = getUniqueColumnValues(header);
+              {file?.headers && file.headers.length > 0 && file.headers.map(header => {
+                // Use dynamic filtering - get options that match current filters
+                const headerUniqueValues = getFilteredUniqueValues(header);
                 const currentValue = filters[header] || "ALL";
+                
+                // Debug logging
+                console.log(`Filter for ${header}:`, {
+                  headerUniqueValues,
+                  uniqueValuesKeys: Object.keys(uniqueValues),
+                  isLoadingUniqueValues,
+                  currentValue,
+                  activeFilters: Object.keys(filters).filter(k => filters[k])
+                });
+                
                 return (
                   <div key={header}>
                     <Select
@@ -338,15 +478,25 @@ const FileView = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="ALL">All {header}</SelectItem>
-                        {uniqueValues.map(value => {
-                          const stringValue = String(value);
-                          if (!stringValue || stringValue.trim() === '') return null;
-                          return (
-                            <SelectItem key={stringValue} value={stringValue}>
-                              {stringValue}
-                            </SelectItem>
-                          );
-                        }).filter(Boolean)}
+                        {isLoadingUniqueValues ? (
+                          <SelectItem value="LOADING" disabled>
+                            Loading options...
+                          </SelectItem>
+                        ) : headerUniqueValues.length === 0 ? (
+                          <SelectItem value="NO_DATA" disabled>
+                            No options available
+                          </SelectItem>
+                        ) : (
+                          headerUniqueValues.map(value => {
+                            const stringValue = String(value);
+                            if (!stringValue || stringValue.trim() === '') return null;
+                            return (
+                              <SelectItem key={stringValue} value={stringValue}>
+                                {stringValue}
+                              </SelectItem>
+                            );
+                          }).filter(Boolean)
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -367,7 +517,30 @@ const FileView = () => {
         <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <CardTitle>Student Data ({pagination.total} records)</CardTitle>
+              <div>
+                <CardTitle className="flex items-center space-x-2">
+                  <span>Data ({pagination.total} records)</span>
+                  {(debouncedSearch || Object.keys(filters).length > 0) && (
+                    <Badge variant="secondary" className="ml-2">
+                      Filtered
+                    </Badge>
+                  )}
+                </CardTitle>
+                {(debouncedSearch || Object.keys(filters).length > 0) && (
+                  <div className="mt-1 space-y-1">
+                    {debouncedSearch && (
+                      <p className="text-sm text-gray-600">
+                        🔍 Searching: "{debouncedSearch}"
+                      </p>
+                    )}
+                    {Object.keys(filters).length > 0 && (
+                      <p className="text-sm text-gray-600">
+                        🎛️ Filters: {Object.entries(filters).map(([k, v]) => `${k}="${v}"`).join(', ')}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="flex items-center space-x-2">
                 <Select 
                   value={pageSize.toString()} 
@@ -407,7 +580,31 @@ const FileView = () => {
                   {!students || students.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={file?.headers?.length || 0} className="text-center py-8">
-                        {isLoading ? 'Loading data...' : 'No data found matching your criteria'}
+                        {isLoading ? (
+                          <div className="flex items-center justify-center space-x-2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                            <span>Loading data...</span>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <p>
+                              {debouncedSearch || Object.keys(filters).length > 0 
+                                ? 'No data found matching your search criteria' 
+                                : 'No data found'
+                              }
+                            </p>
+                            {debouncedSearch && (
+                              <p className="text-sm text-gray-500">
+                                Searched for: "{debouncedSearch}"
+                              </p>
+                            )}
+                            {Object.keys(filters).length > 0 && (
+                              <p className="text-sm text-gray-500">
+                                Active filters: {Object.entries(filters).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                              </p>
+                            )}
+                          </div>
+                        )}
                       </TableCell>
                     </TableRow>
                   ) : (

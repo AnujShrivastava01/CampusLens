@@ -391,8 +391,14 @@ class ApiService {
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.set('page', params.page.toString());
     if (params.limit) queryParams.set('limit', params.limit.toString());
-    if (params.search) queryParams.set('search', params.search);
-    if (params.filters) queryParams.set('filters', JSON.stringify(params.filters));
+    if (params.search && params.search.trim() !== '') {
+      queryParams.set('search', params.search.trim());
+    }
+    if (params.filters && Object.keys(params.filters).length > 0) {
+      queryParams.set('filters', JSON.stringify(params.filters));
+    }
+    
+    const endpoint = `/upload/files/${fileId}/data${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
     
     const response = await this.request<{
       success: boolean;
@@ -415,7 +421,7 @@ class ApiService {
         };
       };
       message?: string;
-    }>(`/upload/files/${fileId}/data?${queryParams.toString()}`);
+    }>(endpoint);
     
     if (!response.success) {
       throw new Error(response.message || 'Failed to fetch file data');
@@ -481,6 +487,53 @@ class ApiService {
     
     if (!response.success) {
       throw new Error(response.message || 'Failed to fetch file columns');
+    }
+    
+    return response;
+  }
+
+  // Get unique values for all columns in a file
+  async getFileUniqueValues(fileId: string): Promise<{
+    success: boolean;
+    uniqueValues: Record<string, any[]>;
+    totalColumns: number;
+  }> {
+    const response = await this.request<{
+      success: boolean;
+      uniqueValues: Record<string, any[]>;
+      totalColumns: number;
+      message?: string;
+    }>(`/upload/files/${fileId}/unique-values`);
+    
+    if (!response.success) {
+      throw new Error(response.message || 'Failed to fetch unique values');
+    }
+    
+    return response;
+  }
+
+  // Get unique values for all columns in a file, filtered by current selections
+  async getFilteredUniqueValues(fileId: string, filters: Record<string, string> = {}): Promise<{
+    success: boolean;
+    uniqueValues: Record<string, any[]>;
+    totalColumns: number;
+    matchingRecords: number;
+  }> {
+    const queryParams = new URLSearchParams();
+    if (Object.keys(filters).length > 0) {
+      queryParams.set('filters', JSON.stringify(filters));
+    }
+    
+    const response = await this.request<{
+      success: boolean;
+      uniqueValues: Record<string, any[]>;
+      totalColumns: number;
+      matchingRecords: number;
+      message?: string;
+    }>(`/upload/files/${fileId}/filtered-unique-values?${queryParams.toString()}`);
+    
+    if (!response.success) {
+      throw new Error(response.message || 'Failed to fetch filtered unique values');
     }
     
     return response;

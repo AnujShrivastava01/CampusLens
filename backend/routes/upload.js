@@ -276,6 +276,202 @@ router.get('/files/:fileId/columns', requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/upload/files/:fileId/unique-values - Get unique values for all columns in a file
+router.get('/files/:fileId/unique-values', requireAuth, async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    
+    const userId = getUserId(req);
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Authentication required' 
+      });
+    }
+    
+    // Verify the file exists and belongs to the user
+    const file = await FileUpload.findOne({ 
+      _id: fileId, 
+      createdBy: userId 
+    });
+    if (!file) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'File not found or you do not have permission to access it' 
+      });
+    }
+
+    // Get all unique values for each column using a simple approach
+    const uniqueValues = {};
+    
+    console.log('📊 Processing headers:', file.headers);
+    console.log('🔍 Looking for records with uploadId:', fileId);
+    
+    // First, get all documents for this file
+    const allRecords = await Student.find({ uploadId: fileId }).lean();
+    console.log(`📈 Found ${allRecords.length} total records for file`);
+    
+    if (allRecords.length === 0) {
+      console.log('❌ No records found for this file');
+      return res.json({
+        success: true,
+        uniqueValues: {},
+        totalColumns: 0
+      });
+    }
+    
+    // Show sample record structure
+    console.log('📋 Sample record structure:', JSON.stringify(allRecords[0], null, 2));
+    
+    for (const header of file.headers) {
+      try {
+        console.log(`🔎 Processing column: ${header}`);
+        
+        const values = new Set();
+        
+        // Extract values from all records
+        allRecords.forEach(record => {
+          let value = null;
+          
+          // Try different ways to get the value
+          if (record._rawData && record._rawData[header] !== undefined) {
+            value = record._rawData[header];
+          } else if (record[header] !== undefined) {
+            value = record[header];
+          }
+          
+          // Add to set if value exists and is not empty
+          if (value !== null && value !== undefined && value !== '') {
+            const stringValue = String(value).trim();
+            if (stringValue.length > 0) {
+              values.add(stringValue);
+            }
+          }
+        });
+        
+        // Convert set to array and limit to 100 values
+        const valuesArray = Array.from(values).slice(0, 100);
+        uniqueValues[header] = valuesArray;
+        
+        console.log(`✅ Found ${valuesArray.length} unique values for ${header}:`, valuesArray.slice(0, 5), valuesArray.length > 5 ? '...' : '');
+        
+      } catch (columnError) {
+        console.error(`❌ Error processing column ${header}:`, columnError);
+        uniqueValues[header] = [];
+      }
+    }
+
+    console.log('🎉 Final unique values result:', uniqueValues);
+    console.log('📊 Total columns processed:', Object.keys(uniqueValues).length);
+
+    res.json({
+      success: true,
+      uniqueValues,
+      totalColumns: Object.keys(uniqueValues).length
+    });
+  } catch (error) {
+    console.error('Error fetching unique values:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to fetch unique values',
+      error: error.message 
+    });
+  }
+});
+
+// GET /api/upload/files/:fileId/filtered-unique-values - Get unique values filtered by current selections
+router.get('/files/:fileId/filtered-unique-values', requireAuth, async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const { filters } = req.query;
+    
+    const userId = getUserId(req);
+    if (!userId) {
+      return res.status(401).json({ 
+        success: false, 
+        message: 'Authentication required' 
+      });
+    }
+    
+    // Verify the file exists and belongs to the user
+    const file = await FileUpload.findOne({ 
+      _id: fileId, 
+      createdBy: userId 
+    });
+    if (!file) {
+      return res.status(404).json({ 
+        success: false, 
+        message: 'File not found or you do not have permission to access it' 
+      });
+    }
+
+    // Parse filters from query string
+    let appliedFilters = {};
+    try {
+      appliedFilters = filters ? JSON.parse(filters) : {};
+    } catch (e) {
+      console.warn('Invalid filters JSON:', filters);
+    }
+
+    console.log('🔍 Getting filtered unique values with filters:', appliedFilters);
+
+    // Build match query for the applied filters
+    let matchQuery = { uploadId: fileId };
+    Object.keys(appliedFilters).forEach(filterKey => {
+      if (appliedFilters[filterKey]) {
+        matchQuery[`_rawData.${filterKey}`] = appliedFilters[filterKey];
+      }
+    });
+
+    console.log('📋 Match query:', matchQuery);
+
+    // Get records that match the current filters
+    const matchingRecords = await Student.find(matchQuery).lean();
+    console.log(`📊 Found ${matchingRecords.length} matching records`);
+
+    // Calculate unique values for each column from matching records
+    const filteredUniqueValues = {};
+    
+    for (const header of file.headers) {
+      const values = new Set();
+      
+      matchingRecords.forEach(record => {
+        let value = null;
+        
+        if (record._rawData && record._rawData[header] !== undefined) {
+          value = record._rawData[header];
+        } else if (record[header] !== undefined) {
+          value = record[header];
+        }
+        
+        if (value !== null && value !== undefined && value !== '') {
+          const stringValue = String(value).trim();
+          if (stringValue.length > 0) {
+            values.add(stringValue);
+          }
+        }
+      });
+      
+      filteredUniqueValues[header] = Array.from(values).slice(0, 100);
+      console.log(`✅ Filtered values for ${header}: ${filteredUniqueValues[header].length} options`);
+    }
+
+    res.json({
+      success: true,
+      uniqueValues: filteredUniqueValues,
+      totalColumns: Object.keys(filteredUniqueValues).length,
+      matchingRecords: matchingRecords.length
+    });
+  } catch (error) {
+    console.error('Error fetching unique values:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Failed to fetch unique values',
+      error: error.message 
+    });
+  }
+});
+
 // GET /api/upload/files/:fileId/data - Get student data for a specific file
 router.get('/files/:fileId/data', requireAuth, async (req, res) => {
   try {
@@ -306,17 +502,21 @@ router.get('/files/:fileId/data', requireAuth, async (req, res) => {
     const query = { uploadId: fileId };
     
     // Add search functionality across all raw data fields
-    if (search) {
+    if (search && search.trim() !== '') {
+      const searchTerm = search.trim();
+      
       // Get all possible fields from headers for this file
       const searchConditions = [
-        { 'studentId': { $regex: search, $options: 'i' } }
+        { 'studentId': { $regex: searchTerm, $options: 'i' } }
       ];
       
       // Add search across all raw data fields dynamically
       if (file.headers && file.headers.length > 0) {
         file.headers.forEach(header => {
+          // Escape special regex characters in header names
+          const escapedHeader = header.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
           searchConditions.push({
-            [`_rawData.${header}`]: { $regex: search, $options: 'i' }
+            [`_rawData.${escapedHeader}`]: { $regex: searchTerm, $options: 'i' }
           });
         });
       }
@@ -325,19 +525,28 @@ router.get('/files/:fileId/data', requireAuth, async (req, res) => {
     }
     
     // Add filters if provided - support dynamic column filtering
-    if (filters) {
+    if (filters && filters.trim() !== '') {
       try {
         const filterObj = JSON.parse(filters);
+        
         Object.entries(filterObj).forEach(([key, value]) => {
-          if (value && value !== '') {
-            // Check if it's a raw data field (column from Excel)
-            if (file.headers && file.headers.includes(key)) {
-              query[`_rawData.${key}`] = { $regex: value, $options: 'i' };
-            } else if (key === 'studentId') {
-              query[key] = { $regex: value, $options: 'i' };
-            } else {
-              // Fallback for any other fields
-              query[key] = { $regex: value, $options: 'i' };
+          if (value && value !== '' && value !== 'ALL') {
+            const filterValue = String(value).trim();
+            if (filterValue.length > 0) {
+              // Check if it's a raw data field (column from Excel)
+              if (file.headers && file.headers.includes(key)) {
+                // Escape special regex characters in both key and value
+                const escapedKey = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const escapedValue = filterValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                query[`_rawData.${escapedKey}`] = { $regex: `^${escapedValue}$`, $options: 'i' };
+              } else if (key === 'studentId') {
+                const escapedValue = filterValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                query[key] = { $regex: `^${escapedValue}$`, $options: 'i' };
+              } else {
+                // Fallback for any other fields
+                const escapedValue = filterValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                query[key] = { $regex: `^${escapedValue}$`, $options: 'i' };
+              }
             }
           }
         });
