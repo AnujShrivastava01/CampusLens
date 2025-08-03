@@ -2,7 +2,7 @@ import Layout from "@/components/Layout/Layout";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Upload, FileSpreadsheet, Users, Calendar, Loader2 } from "lucide-react";
+import { Upload, FileSpreadsheet, User, Calendar, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "@/services/api";
@@ -181,12 +181,12 @@ const Dashboard = () => {
             <Card className="glass-card p-6">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
-                  <Users className="h-6 w-6 text-white" />
+                  <User className="h-6 w-6 text-white" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Total Students</p>
+                  <p className="text-sm text-muted-foreground">Welcome</p>
                   <p className="text-2xl font-bold">
-                    {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : formatNumber(stats?.totalStudents || 0)}
+                    {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : user?.firstName || user?.fullName || 'User'}
                   </p>
                 </div>
               </div>

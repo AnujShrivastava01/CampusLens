@@ -251,11 +251,11 @@ const FileView = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="default" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
+        return <Badge variant="default" className="bg-green-500 hover:bg-green-600 text-white border-green-500"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
       case 'completed_with_errors':
-        return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />With Errors</Badge>;
+        return <Badge variant="destructive" className="bg-red-500 hover:bg-red-600 text-white border-red-500"><AlertCircle className="w-3 h-3 mr-1" />With Errors</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline" className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700">{status}</Badge>;
     }
   };
 
@@ -306,7 +306,7 @@ const FileView = () => {
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading...</p>
+              <p className="text-gray-600 dark:text-gray-400">Loading...</p>
             </div>
           </div>
         </div>
@@ -320,18 +320,18 @@ const FileView = () => {
       <Layout>
         <div className="container mx-auto px-4 py-8 max-w-7xl">
           <div className="flex items-center justify-center min-h-[400px]">
-            <Card className="p-8 text-center max-w-md">
+            <Card className="p-8 text-center max-w-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <FileSpreadsheet className="w-16 h-16 text-blue-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Sign In Required</h3>
-              <p className="text-gray-600 mb-6">
+              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">Sign In Required</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
                 Please sign in to view file data.
               </p>
               <div className="space-x-2">
                 <SignInButton mode="modal">
-                  <Button>Sign In</Button>
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white">Sign In</Button>
                 </SignInButton>
                 <SignUpButton mode="modal">
-                  <Button variant="outline">Sign Up</Button>
+                  <Button variant="outline" className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600">Sign Up</Button>
                 </SignUpButton>
               </div>
             </Card>
@@ -385,19 +385,19 @@ const FileView = () => {
           {/* Header */}
           <div className="flex flex-col items-center space-y-4">
             <div className="w-full flex items-center justify-start">
-              <Button variant="outline" onClick={() => navigate('/files')}>
+              <Button variant="outline" onClick={() => navigate('/files')} className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600">
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 Back to Files
               </Button>
             </div>
             <div className="text-center">
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center justify-center">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center justify-center">
                 <FileSpreadsheet className="w-8 h-8 mr-3 text-green-600" />
                 {file.filename}
               </h1>
               <div className="flex items-center justify-center space-x-4 mt-2">
                 {getStatusBadge(file.status)}
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {file.totalRecords} total • {file.processedRecords} processed
                   {file.failedRecords > 0 && ` • ${file.failedRecords} failed`}
                 </span>
@@ -406,9 +406,9 @@ const FileView = () => {
           </div>
 
         {/* Filters and Search */}
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <CardHeader>
-            <CardTitle className="flex items-center">
+            <CardTitle className="flex items-center text-gray-900 dark:text-gray-100">
               <Filter className="w-5 h-5 mr-2" />
               Filters and Search
             </CardTitle>
@@ -418,12 +418,12 @@ const FileView = () => {
               {/* Global Search */}
               <div className="md:col-span-2 lg:col-span-1">
                 <div className="relative">
-                  <Search className={`absolute left-3 top-3 h-4 w-4 ${debouncedSearch ? 'text-blue-500' : 'text-gray-400'}`} />
+                  <Search className={`absolute left-3 top-3 h-4 w-4 ${debouncedSearch ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500'}`} />
                   <Input
                     placeholder="Search all fields..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className={`pl-10 ${debouncedSearch ? 'border-blue-300 bg-blue-50' : ''}`}
+                    className={`pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ${debouncedSearch ? 'border-blue-300 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''}`}
                   />
                   {search !== debouncedSearch && (
                     <div className="absolute right-8 top-3 h-4 w-4">
@@ -438,7 +438,7 @@ const FileView = () => {
                   {search && (
                     <button
                       onClick={() => setSearch('')}
-                      className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
+                      className="absolute right-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                       title="Clear search"
                     >
                       ×
@@ -446,7 +446,7 @@ const FileView = () => {
                   )}
                 </div>
                 {debouncedSearch && (
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Searching for: "{debouncedSearch}"
                   </p>
                 )}
@@ -458,32 +458,23 @@ const FileView = () => {
                 const headerUniqueValues = getFilteredUniqueValues(header);
                 const currentValue = filters[header] || "ALL";
                 
-                // Debug logging
-                console.log(`Filter for ${header}:`, {
-                  headerUniqueValues,
-                  uniqueValuesKeys: Object.keys(uniqueValues),
-                  isLoadingUniqueValues,
-                  currentValue,
-                  activeFilters: Object.keys(filters).filter(k => filters[k])
-                });
-                
                 return (
                   <div key={header}>
                     <Select
                       value={currentValue}
                       onValueChange={(value) => handleFilterChange(header, value === "ALL" ? undefined : value)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100">
                         <SelectValue placeholder={`Filter by ${header}`} />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ALL">All {header}</SelectItem>
+                      <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                        <SelectItem value="ALL" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">All {header}</SelectItem>
                         {isLoadingUniqueValues ? (
-                          <SelectItem value="LOADING" disabled>
+                          <SelectItem value="LOADING" disabled className="text-gray-500 dark:text-gray-400">
                             Loading options...
                           </SelectItem>
                         ) : headerUniqueValues.length === 0 ? (
-                          <SelectItem value="NO_DATA" disabled>
+                          <SelectItem value="NO_DATA" disabled className="text-gray-500 dark:text-gray-400">
                             No options available
                           </SelectItem>
                         ) : (
@@ -491,7 +482,11 @@ const FileView = () => {
                             const stringValue = String(value);
                             if (!stringValue || stringValue.trim() === '') return null;
                             return (
-                              <SelectItem key={stringValue} value={stringValue}>
+                              <SelectItem 
+                                key={stringValue} 
+                                value={stringValue}
+                                className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600"
+                              >
                                 {stringValue}
                               </SelectItem>
                             );
@@ -505,7 +500,7 @@ const FileView = () => {
               
               {/* Clear Filters */}
               <div className="flex items-end">
-                <Button variant="outline" onClick={clearFilters} className="w-full">
+                <Button variant="outline" onClick={clearFilters} className="w-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600">
                   Clear Filters
                 </Button>
               </div>
@@ -514,14 +509,14 @@ const FileView = () => {
         </Card>
 
         {/* Data Table */}
-        <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <Card className="shadow-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
-                <CardTitle className="flex items-center space-x-2">
+                <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-gray-100">
                   <span>Data ({pagination.total} records)</span>
                   {(debouncedSearch || Object.keys(filters).length > 0) && (
-                    <Badge variant="secondary" className="ml-2">
+                    <Badge variant="secondary" className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                       Filtered
                     </Badge>
                   )}
@@ -529,12 +524,12 @@ const FileView = () => {
                 {(debouncedSearch || Object.keys(filters).length > 0) && (
                   <div className="mt-1 space-y-1">
                     {debouncedSearch && (
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         🔍 Searching: "{debouncedSearch}"
                       </p>
                     )}
                     {Object.keys(filters).length > 0 && (
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
                         🎛️ Filters: {Object.entries(filters).map(([k, v]) => `${k}="${v}"`).join(', ')}
                       </p>
                     )}
@@ -551,26 +546,26 @@ const FileView = () => {
                     }
                   }}
                 >
-                  <SelectTrigger className="w-20">
+                  <SelectTrigger className="w-20 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="25">25</SelectItem>
-                    <SelectItem value="50">50</SelectItem>
-                    <SelectItem value="100">100</SelectItem>
+                  <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                    <SelectItem value="25" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">25</SelectItem>
+                    <SelectItem value="50" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">50</SelectItem>
+                    <SelectItem value="100" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">100</SelectItem>
                   </SelectContent>
                 </Select>
-                <span className="text-sm text-gray-500">per page</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">per page</span>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border overflow-x-auto">
+            <div className="rounded-md border border-gray-200 dark:border-gray-700 overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
+                  <TableRow className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
                     {file?.headers && file.headers.map(header => (
-                      <TableHead key={header} className="min-w-[150px]">
+                      <TableHead key={header} className="min-w-[150px] text-gray-900 dark:text-gray-100 font-medium">
                         {header}
                       </TableHead>
                     ))}
@@ -578,8 +573,8 @@ const FileView = () => {
                 </TableHeader>
                 <TableBody>
                   {!students || students.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={file?.headers?.length || 0} className="text-center py-8">
+                    <TableRow className="border-b border-gray-200 dark:border-gray-700">
+                      <TableCell colSpan={file?.headers?.length || 0} className="text-center py-8 text-gray-900 dark:text-gray-100">
                         {isLoading ? (
                           <div className="flex items-center justify-center space-x-2">
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
@@ -594,12 +589,12 @@ const FileView = () => {
                               }
                             </p>
                             {debouncedSearch && (
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
                                 Searched for: "{debouncedSearch}"
                               </p>
                             )}
                             {Object.keys(filters).length > 0 && (
-                              <p className="text-sm text-gray-500">
+                              <p className="text-sm text-gray-500 dark:text-gray-400">
                                 Active filters: {Object.entries(filters).map(([k, v]) => `${k}: ${v}`).join(', ')}
                               </p>
                             )}
@@ -609,9 +604,9 @@ const FileView = () => {
                     </TableRow>
                   ) : (
                     students.map((student, index) => (
-                      <TableRow key={student._id || index}>
+                      <TableRow key={student._id || index} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                         {file?.headers && file.headers.map(header => (
-                          <TableCell key={header}>
+                          <TableCell key={header} className="text-gray-900 dark:text-gray-100">
                             {renderCellValue(student._rawData?.[header] || student[header as keyof Student])}
                           </TableCell>
                         ))}
@@ -625,7 +620,7 @@ const FileView = () => {
             {/* Pagination */}
             {pagination.pages > 1 && (
               <div className="flex items-center justify-between mt-4">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
                   {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                   {pagination.total} results
@@ -636,11 +631,12 @@ const FileView = () => {
                     size="sm"
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage <= 1}
+                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Previous
                   </Button>
-                  <span className="text-sm">
+                  <span className="text-sm text-gray-900 dark:text-gray-100">
                     Page {pagination.page} of {pagination.pages}
                   </span>
                   <Button
@@ -648,6 +644,7 @@ const FileView = () => {
                     size="sm"
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage >= pagination.pages}
+                    className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                     <ChevronRight className="w-4 h-4" />

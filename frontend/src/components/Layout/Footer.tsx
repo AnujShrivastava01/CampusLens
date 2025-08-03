@@ -10,9 +10,9 @@ const Footer = () => {
       viewport={{ once: true }}
       className="mt-20 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-t border-gray-200 dark:border-gray-700"
     >
-      <div className="w-full py-8 px-4">
+      <div className="w-full py-6 px-4">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex flex-col md:flex-row items-center justify-center md:justify-between space-y-4 md:space-y-0 relative">
+          <div className="flex flex-col md:flex-row items-center justify-center md:justify-between space-y-3 md:space-y-0 relative">
             {/* Left side - Hidden on desktop for centering, visible on mobile */}
             <div className="hidden md:block md:w-48"></div>
 
@@ -62,7 +62,7 @@ const Footer = () => {
           </div>
 
           {/* Bottom line */}
-          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <p className="text-center text-sm text-muted-foreground">
               © {new Date().getFullYear()} CampusLens. All rights reserved.
             </p>

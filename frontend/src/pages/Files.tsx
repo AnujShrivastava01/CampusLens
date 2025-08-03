@@ -94,15 +94,15 @@ const Files = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="default" className="bg-green-500"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
+        return <Badge variant="default" className="bg-green-500 hover:bg-green-600 text-white border-green-500"><CheckCircle className="w-3 h-3 mr-1" />Completed</Badge>;
       case 'completed_with_errors':
-        return <Badge variant="destructive"><AlertCircle className="w-3 h-3 mr-1" />With Errors</Badge>;
+        return <Badge variant="destructive" className="bg-red-500 hover:bg-red-600 text-white border-red-500"><AlertCircle className="w-3 h-3 mr-1" />With Errors</Badge>;
       case 'processing':
-        return <Badge variant="secondary">Processing</Badge>;
+        return <Badge variant="secondary" className="bg-blue-500 hover:bg-blue-600 text-white border-blue-500">Processing</Badge>;
       case 'failed':
-        return <Badge variant="destructive">Failed</Badge>;
+        return <Badge variant="destructive" className="bg-red-500 hover:bg-red-600 text-white border-red-500">Failed</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>;
+        return <Badge variant="outline" className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700">{status}</Badge>;
     }
   };
 
@@ -149,10 +149,12 @@ const Files = () => {
   if (!isLoaded) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading...</p>
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+            </div>
           </div>
         </div>
       </Layout>
@@ -188,8 +190,13 @@ const Files = () => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-600 dark:text-gray-400">Loading your files...</p>
+            </div>
+          </div>
         </div>
       </Layout>
     );
@@ -198,13 +205,15 @@ const Files = () => {
   if (error) {
     return (
       <Layout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Card className="p-6 text-center">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Error Loading Files</h3>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <Button onClick={fetchFiles}>Retry</Button>
-          </Card>
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <Card className="p-6 text-center bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-gray-100">Error Loading Files</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
+              <Button onClick={fetchFiles} className="bg-blue-600 hover:bg-blue-700 text-white">Retry</Button>
+            </Card>
+          </div>
         </div>
       </Layout>
     );
@@ -212,32 +221,40 @@ const Files = () => {
 
   return (
     <Layout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Uploaded Files</h1>
-            <p className="text-gray-600 mt-1">
-              View and manage your uploaded Excel files
-            </p>
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="space-y-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Uploaded Files</h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-1">
+                View and manage your uploaded Excel files
+              </p>
+            </div>
+            <Button 
+              onClick={() => navigate('/dashboard')}
+              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600"
+              variant="outline"
+            >
+              Back to Dashboard
+            </Button>
           </div>
-          <Button onClick={() => navigate('/dashboard')}>
-            Back to Dashboard
-          </Button>
-        </div>
 
         {files.length === 0 ? (
-          <Card className="p-12 text-center">
-            <FileSpreadsheet className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Files Found</h3>
-            <p className="text-gray-600 mb-6">
+          <Card className="p-12 text-center border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <FileSpreadsheet className="w-16 h-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-gray-100">No Files Found</h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
               You haven't uploaded any files yet. Upload your first Excel file to get started.
             </p>
-            <Button onClick={() => navigate('/dashboard')}>
+            <Button 
+              onClick={() => navigate('/dashboard')}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
               Go to Dashboard
             </Button>
           </Card>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-6 max-w-5xl mx-auto">
             {files.map((file, index) => (
               <motion.div
                 key={file._id}
@@ -245,14 +262,14 @@ const Files = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="hover:shadow-lg transition-shadow duration-200">
+                <Card className="hover:shadow-lg transition-shadow duration-200 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <FileSpreadsheet className="w-8 h-8 text-green-600" />
                         <div>
-                          <CardTitle className="text-lg">{file.filename}</CardTitle>
-                          <p className="text-sm text-gray-500">
+                          <CardTitle className="text-lg text-gray-900 dark:text-gray-100">{file.filename}</CardTitle>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {formatFileSize(file.size)} • Uploaded {formatDate(file.createdAt)}
                           </p>
                         </div>
@@ -263,7 +280,7 @@ const Files = () => {
                           <Button
                             size="sm"
                             onClick={() => handleViewFile(file._id)}
-                            className="ml-2"
+                            className="ml-2 bg-blue-600 hover:bg-blue-700 text-white"
                           >
                             <Eye className="w-4 h-4 mr-1" />
                             View Data
@@ -272,7 +289,7 @@ const Files = () => {
                             size="sm"
                             variant="outline"
                             onClick={() => handleDeleteFile(file._id, file.filename)}
-                            className="text-red-600 hover:text-red-700"
+                            className="text-red-600 hover:text-red-700 border-red-300 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -284,28 +301,28 @@ const Files = () => {
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div className="flex items-center space-x-2">
                         <Users className="w-4 h-4 text-blue-500" />
-                        <span>
-                          <span className="font-medium">{file.totalRecords}</span> Total Records
+                        <span className="text-gray-700 dark:text-gray-300">
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{file.totalRecords}</span> Total Records
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
                         <CheckCircle className="w-4 h-4 text-green-500" />
-                        <span>
-                          <span className="font-medium">{file.processedRecords}</span> Processed
+                        <span className="text-gray-700 dark:text-gray-300">
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{file.processedRecords}</span> Processed
                         </span>
                       </div>
                       {file.failedRecords > 0 && (
                         <div className="flex items-center space-x-2">
                           <AlertCircle className="w-4 h-4 text-red-500" />
-                          <span>
-                            <span className="font-medium">{file.failedRecords}</span> Failed
+                          <span className="text-gray-700 dark:text-gray-300">
+                            <span className="font-medium text-gray-900 dark:text-gray-100">{file.failedRecords}</span> Failed
                           </span>
                         </div>
                       )}
                     </div>
                     {file.completedAt && (
-                      <div className="mt-3 pt-3 border-t border-gray-200">
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
                           <Calendar className="w-4 h-4" />
                           <span>Completed {formatDate(file.completedAt)}</span>
                         </div>
@@ -317,6 +334,7 @@ const Files = () => {
             ))}
           </div>
         )}
+        </div>
       </div>
     </Layout>
   );

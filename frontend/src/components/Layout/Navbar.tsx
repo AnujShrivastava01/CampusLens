@@ -4,12 +4,14 @@ import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadshee
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setMounted(true);
@@ -17,6 +19,23 @@ const Navbar = () => {
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
+  };
+
+  // Smart navigation function for logo/heading clicks
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    if (location.pathname === '/') {
+      // If on landing page, smooth scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    } else {
+      // If on other pages, navigate to landing page
+      navigate('/');
+      // The Index component will handle scrolling to top via useEffect
+    }
   };
 
   return (
@@ -29,22 +48,21 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo Section */}
-          <Link to="/">
-            <motion.div
-              className="flex items-center space-x-3 cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-            >
-              <img 
-                src="/logo1.png" 
-                alt="CampusLens Logo" 
-                className="w-10 h-10 object-contain"
-              />
-              <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                CampusLens
-              </span>
-            </motion.div>
-          </Link>
+          <motion.div
+            className="flex items-center space-x-3 cursor-pointer"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            onClick={handleLogoClick}
+          >
+            <img 
+              src="/logo1.png" 
+              alt="CampusLens Logo" 
+              className="w-10 h-10 object-contain"
+            />
+            <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+              CampusLens
+            </span>
+          </motion.div>
 
                   {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
