@@ -145,6 +145,51 @@ const Files = () => {
     }
   };
 
+  const handleDownloadFile = async (fileId: string, filename: string) => {
+    if (!isSignedIn) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please sign in to download files",
+      });
+      return;
+    }
+
+    try {
+      toast({
+        title: "Download Started",
+        description: "Preparing your file download...",
+      });
+
+      const blob = await apiService.downloadFile(fileId);
+      
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Success",
+        description: `File "${filename}" downloaded successfully`,
+      });
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to download file';
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: errorMessage,
+      });
+    }
+  };
+
   // Show loading state while Clerk is initializing
   if (!isLoaded) {
     return (
@@ -221,11 +266,11 @@ const Files = () => {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="space-y-6">
-          <div className="flex justify-between items-center">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Uploaded Files</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Uploaded Files</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
                 View and manage your uploaded Excel files
               </p>
@@ -254,7 +299,7 @@ const Files = () => {
             </Button>
           </Card>
         ) : (
-          <div className="grid gap-6 max-w-5xl mx-auto">
+          <div className="grid gap-4 sm:gap-6 max-w-5xl mx-auto">
             {files.map((file, index) => (
               <motion.div
                 key={file._id}
@@ -264,26 +309,37 @@ const Files = () => {
               >
                 <Card className="hover:shadow-lg transition-shadow duration-200 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                   <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <FileSpreadsheet className="w-8 h-8 text-green-600" />
-                        <div>
-                          <CardTitle className="text-lg text-gray-900 dark:text-gray-100">{file.filename}</CardTitle>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div className="flex items-center space-x-3 min-w-0 flex-1">
+                        <FileSpreadsheet className="w-8 h-8 text-green-600 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <CardTitle className="text-lg text-gray-900 dark:text-gray-100 truncate">{file.filename}</CardTitle>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             {formatFileSize(file.size)} • Uploaded {formatDate(file.createdAt)}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
                         {getStatusBadge(file.status)}
-                        <div className="flex items-center space-x-1">
+                        <div className="flex items-center gap-1 w-full sm:w-auto">
                           <Button
                             size="sm"
                             onClick={() => handleViewFile(file._id)}
-                            className="ml-2 bg-blue-600 hover:bg-blue-700 text-white"
+                            className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white"
                           >
                             <Eye className="w-4 h-4 mr-1" />
-                            View Data
+                            <span className="hidden sm:inline">View Data</span>
+                            <span className="sm:hidden">View</span>
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDownloadFile(file._id, file.filename)}
+                            className="flex-1 sm:flex-none text-green-600 hover:text-green-700 border-green-300 dark:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
+                          >
+                            <Download className="w-4 h-4 mr-1" />
+                            <span className="hidden sm:inline">Download</span>
+                            <span className="sm:hidden">DL</span>
                           </Button>
                           <Button
                             size="sm"
@@ -298,22 +354,22 @@ const Files = () => {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-4 text-sm">
                       <div className="flex items-center space-x-2">
-                        <Users className="w-4 h-4 text-blue-500" />
+                        <Users className="w-4 h-4 text-blue-500 flex-shrink-0" />
                         <span className="text-gray-700 dark:text-gray-300">
                           <span className="font-medium text-gray-900 dark:text-gray-100">{file.totalRecords}</span> Total Records
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
                         <span className="text-gray-700 dark:text-gray-300">
                           <span className="font-medium text-gray-900 dark:text-gray-100">{file.processedRecords}</span> Processed
                         </span>
                       </div>
                       {file.failedRecords > 0 && (
                         <div className="flex items-center space-x-2">
-                          <AlertCircle className="w-4 h-4 text-red-500" />
+                          <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
                           <span className="text-gray-700 dark:text-gray-300">
                             <span className="font-medium text-gray-900 dark:text-gray-100">{file.failedRecords}</span> Failed
                           </span>
@@ -323,7 +379,7 @@ const Files = () => {
                     {file.completedAt && (
                       <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                         <div className="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                          <Calendar className="w-4 h-4" />
+                          <Calendar className="w-4 h-4 flex-shrink-0" />
                           <span>Completed {formatDate(file.completedAt)}</span>
                         </div>
                       </div>

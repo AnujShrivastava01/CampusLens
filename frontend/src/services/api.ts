@@ -560,6 +560,30 @@ class ApiService {
     return response;
   }
 
+  // Download uploaded file
+  async downloadFile(fileId: string): Promise<Blob> {
+    // Get the Clerk session token
+    let token = '';
+    try {
+      token = (await window.Clerk?.session?.getToken()) || '';
+    } catch (tokenError) {
+      console.warn('Could not get Clerk token:', tokenError);
+      throw new Error('Authentication required. Please sign in again.');
+    }
+
+    const response = await fetch(`${this.baseUrl}/upload/files/${fileId}/download`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to download file');
+    }
+
+    return response.blob();
+  }
+
   async downloadTemplate(): Promise<Blob> {
     const response = await fetch(`${this.baseUrl}/upload/template`);
     
@@ -586,4 +610,5 @@ export const {
   uploadExcel,
   validateExcel,
   downloadTemplate,
+  downloadFile,
 } = apiService;

@@ -823,6 +823,65 @@ router.post('/excel', upload.single('file'), requireAuth, async (req, res) => {
   }
 });
 
+// GET /api/upload/files/:fileId/download - Download uploaded file
+router.get('/files/:fileId/download', requireAuth, async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const userId = getUserId(req);
+
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    // Find the file upload record
+    const fileUpload = await FileUpload.findOne({
+      _id: fileId,
+      createdBy: userId
+    });
+
+    if (!fileUpload) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    // Get all students data for this file
+    const students = await Student.find({
+      uploadId: fileId,
+      createdBy: userId
+    });
+
+    if (students.length === 0) {
+      return res.status(404).json({ message: 'No data found for this file' });
+    }
+
+    // Convert student data back to Excel format
+    const excelData = students.map(student => student._rawData);
+
+    // Create workbook and worksheet
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+
+    // Add worksheet to workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Students');
+
+    // Generate buffer
+    const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+
+    // Set headers for file download
+    const filename = fileUpload.filename || 'student_data.xlsx';
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+    res.send(buffer);
+
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    res.status(500).json({ 
+      message: 'Error downloading file', 
+      error: error.message 
+    });
+  }
+});
+
 // GET /api/upload/template - Download Excel template
 router.get('/template', (req, res) => {
   try {
