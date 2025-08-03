@@ -89,6 +89,21 @@ const authMiddleware = (req, res, next) => {
 app.use('/api/students', authMiddleware, studentRoutes);
 app.use('/api/upload', uploadRoutes); // Upload routes handle auth internally
 
+// Add root route to fix "Route not found" error
+app.get('/', (req, res) => {
+  res.json({
+    message: 'CampusLens API Server is running!',
+    version: '1.0.0',
+    status: 'online',
+    endpoints: {
+      health: '/api/health',
+      students: '/api/students',
+      upload: '/api/upload'
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Helper function to mask sensitive information in connection string
 function maskMongoDBUri(uri) {
   if (!uri) return 'undefined';
