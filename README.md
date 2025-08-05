@@ -2,7 +2,7 @@
 
 <!-- Animated Logo -->
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=40&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=600&height=80&lines=CampusLens+📚;Student+Data+Management+🎓;Made+with+💖+by+Anuj">
+  <source media="(prefers-color-scheme: dark)" srcset="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=40&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=600&height=80&lines=CampusLens+📚;Student+Data+Management;Made+with+💖+by+Anuj">
   <img alt="CampusLens" src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=40&duration=3000&pause=1000&color=3B82F6&center=true&vCenter=true&width=600&height=80&lines=CampusLens+📚;Student+Data+Management+🎓;Made+with+💖+by+Anuj">
 </picture>
 
