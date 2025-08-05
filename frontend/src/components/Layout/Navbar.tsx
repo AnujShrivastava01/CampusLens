@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadsheet, LucideIcon } from "lucide-react";
+import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadsheet, User, LucideIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
@@ -59,6 +59,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-1">
             <NavLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
             <NavLink to="/files" icon={FileSpreadsheet} label="Files" />
+            <NavLink to="/developer" icon={User} label="Developer" />
           </div>
 
           {/* Right Section */}

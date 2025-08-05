@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Students from "./pages/Students";
 import Files from "./pages/Files";
 import FileView from "./pages/FileView";
+import Developer from "./pages/Developer";
 import NotFound from "./pages/NotFound";
 import "@/styles/transitions.css";
 import { useState } from "react";
@@ -52,6 +53,7 @@ const App = () => {
                 <Route path="/students" element={<PageTransition><Students /></PageTransition>} />
                 <Route path="/files" element={<PageTransition><Files /></PageTransition>} />
                 <Route path="/files/:fileId" element={<PageTransition><FileView /></PageTransition>} />
+                <Route path="/developer" element={<PageTransition><Developer /></PageTransition>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
               </Routes>

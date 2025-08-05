@@ -68,8 +68,88 @@ export const Preloader = ({ onComplete }: PreloaderProps) => {
             `
           }}
         >
-          {/* Enhanced Background Pattern */}
+          {/* Enhanced Background Pattern with Excel Design */}
           <div className="absolute inset-0 opacity-20">
+            {/* Excel-like Grid Background */}
+            <div 
+              className="absolute inset-0 opacity-10 blur-sm"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+                `,
+                backgroundSize: '40px 30px'
+              }}
+            ></div>
+            
+            {/* Excel Column Headers */}
+            <div className="absolute top-20 left-20 blur-md opacity-15">
+              <div className="flex space-x-1">
+                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map((col, index) => (
+                  <div 
+                    key={col}
+                    className="w-12 h-8 bg-slate-300/30 border border-slate-400/20 flex items-center justify-center text-xs font-semibold text-slate-600"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    {col}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Excel Row Numbers */}
+            <div className="absolute top-32 left-8 blur-md opacity-15">
+              <div className="flex flex-col space-y-1">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((row) => (
+                  <div 
+                    key={row}
+                    className="w-8 h-6 bg-slate-300/30 border border-slate-400/20 flex items-center justify-center text-xs font-semibold text-slate-600"
+                  >
+                    {row}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Excel Data Cells */}
+            <div className="absolute top-32 left-20 blur-md opacity-10">
+              <div className="grid grid-cols-8 gap-1">
+                {Array.from({ length: 64 }, (_, i) => (
+                  <div 
+                    key={i}
+                    className="w-12 h-6 bg-white/40 border border-slate-300/30 text-xs text-slate-500 flex items-center px-1"
+                  >
+                    {i % 3 === 0 ? 'Name' : i % 3 === 1 ? '123' : 'Data'}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Excel Sheet Tabs */}
+            <div className="absolute bottom-20 left-20 blur-md opacity-15">
+              <div className="flex space-x-2">
+                {['Students', 'Faculty', 'Courses'].map((tab, index) => (
+                  <div 
+                    key={tab}
+                    className={`px-4 py-2 text-xs font-medium border-t-2 ${
+                      index === 0 
+                        ? 'bg-white/50 border-blue-400/50 text-blue-600' 
+                        : 'bg-slate-200/30 border-slate-300/30 text-slate-600'
+                    }`}
+                  >
+                    {tab}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Excel Formula Bar */}
+            <div className="absolute top-12 left-32 right-32 blur-md opacity-15">
+              <div className="h-6 bg-white/40 border border-slate-300/30 flex items-center px-2 text-xs text-slate-600">
+                =VLOOKUP(A2,Students!A:D,2,FALSE)
+              </div>
+            </div>
+
             {/* Main gradient orbs - lighter and more subtle */}
             <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-300/15 to-purple-400/15 rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-gradient-to-r from-purple-300/15 to-pink-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
@@ -90,12 +170,15 @@ export const Preloader = ({ onComplete }: PreloaderProps) => {
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-blue-100/10"></div>
             <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-indigo-50/5 to-purple-100/10"></div>
             
-            {/* Subtle grid pattern */}
+            {/* Enhanced spreadsheet grid overlay */}
             <div 
-              className="absolute inset-0 opacity-5"
+              className="absolute inset-0 opacity-8"
               style={{
-                backgroundImage: `radial-gradient(circle at 25px 25px, rgba(99, 102, 241, 0.2) 1px, transparent 1px)`,
-                backgroundSize: '50px 50px'
+                backgroundImage: `
+                  linear-gradient(rgba(59, 130, 246, 0.15) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(59, 130, 246, 0.15) 1px, transparent 1px)
+                `,
+                backgroundSize: '60px 40px'
               }}
             ></div>
           </div>
