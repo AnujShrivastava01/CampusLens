@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { PageTransition } from "@/components/PageTransition";
-import { PWAInstallPrompt } from "@/components/PWAInstallPrompt";
 import Navbar from "@/components/Layout/Navbar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -44,7 +43,6 @@ const App = () => (
               <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
             </Routes>
           </BrowserRouter>
-          <PWAInstallPrompt />
         </TooltipProvider>
       </ThemeProvider>
     </QueryClientProvider>
