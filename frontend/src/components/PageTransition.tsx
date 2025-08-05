@@ -13,10 +13,10 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
     // Start transition
     setIsTransitioning(true);
     
-    // End transition after a brief moment
+    // End transition after a longer moment for smoother effect
     const timer = setTimeout(() => {
       setIsTransitioning(false);
-    }, 50);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [location.pathname]);
@@ -26,10 +26,15 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
       className="page-wrapper"
       style={{
         opacity: isTransitioning ? 0 : 1,
-        transform: isTransitioning ? 'scale(0.98)' : 'scale(1)',
-        transition: 'all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1)',
+        transform: isTransitioning 
+          ? 'translateY(25px)' 
+          : 'translateY(0px)',
+        filter: isTransitioning ? 'blur(6px)' : 'blur(0px)',
+        transition: 'all 2.2s cubic-bezier(0.16, 1, 0.3, 1)',
         minHeight: '100vh',
         width: '100%',
+        willChange: 'transform, opacity, filter',
+        backfaceVisibility: 'hidden',
       }}
     >
       {children}

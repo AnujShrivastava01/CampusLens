@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadsheet } from "lucide-react";
+import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadsheet, LucideIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
@@ -27,7 +27,10 @@ const Navbar = () => {
           {/* Logo Section */}
           <Link 
             to="/"
-            className="flex items-center space-x-3 cursor-pointer hover:scale-105 transition-transform duration-200"
+            className="flex items-center space-x-3 cursor-pointer nav-link-home"
+            style={{
+              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
             onClick={(e) => {
               // If we're already on the home page, prevent navigation and just scroll
               if (location.pathname === "/") {
@@ -35,11 +38,17 @@ const Navbar = () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }
             }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px) scale(1.02)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0px) scale(1)';
+            }}
           >
             <img 
               src="/logo1.png" 
               alt="CampusLens Logo" 
-              className="w-10 h-10 object-contain"
+              className="w-10 h-10 object-contain transition-transform duration-300"
             />
             <span className="text-xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
               CampusLens
@@ -98,7 +107,7 @@ const Navbar = () => {
 };
 
 // Navigation Link Component
-const NavLink = ({ to, icon: Icon, label }: { to: string; icon: any; label: string }) => {
+const NavLink = ({ to, icon: Icon, label }: { to: string; icon: LucideIcon; label: string }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
   

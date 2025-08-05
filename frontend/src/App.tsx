@@ -14,6 +14,7 @@ import Students from "./pages/Students";
 import Files from "./pages/Files";
 import FileView from "./pages/FileView";
 import NotFound from "./pages/NotFound";
+import "@/styles/transitions.css";
 
 const queryClient = new QueryClient();
 

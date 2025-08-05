@@ -1,0 +1,93 @@
+/* Enhanced page transitions and animations */
+
+/* Page transition wrapper enhancements */
+.page-wrapper {
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Home page specific animations */
+.home-page-wrapper {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Smooth entrance animations for sections */
+.section-entrance {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Navigation feedback animations */
+.nav-link-home {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-link-home:hover {
+  transform: translateY(-1px);
+}
+
+.nav-link-home:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+/* Enhanced glass morphism for navbar during transitions */
+.glass-nav {
+  transition: backdrop-filter 0.3s ease, background-color 0.3s ease;
+}
+
+/* Fade-in animation keyframes */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Utility classes for home page elements */
+.animate-fade-in-up {
+  animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger animations */
+.stagger-1 {
+  animation-delay: 0.1s;
+}
+
+.stagger-2 {
+  animation-delay: 0.2s;
+}
+
+.stagger-3 {
+  animation-delay: 0.3s;
+}
+
+.stagger-4 {
+  animation-delay: 0.4s;
+}
+
+/* Initial hidden state for animations */
+.animate-on-load {
+  opacity: 0;
+  transform: translateY(20px);
+}
