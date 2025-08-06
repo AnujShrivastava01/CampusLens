@@ -1,15 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Database, ChevronDown } from "lucide-react";
+import { ArrowRight, Database } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SignInButton, useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
-import { useLenisSmoothScroll } from "@/hooks/useLenisSmoothScroll";
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const { isSignedIn } = useUser();
   const [isVisible, setIsVisible] = useState(false);
-  const { scrollToSection } = useLenisSmoothScroll();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -19,7 +17,7 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section id="hero" className="min-h-screen relative overflow-hidden -mt-20 pt-20">
+    <section className="min-h-screen relative overflow-hidden -mt-20 pt-20">
       {/* Background Image - Starts from very top */}
       <div 
         className="absolute inset-0 -top-20 bg-cover bg-center bg-no-repeat"
@@ -128,26 +126,6 @@ const HeroSection = () => {
               </Button>
             </SignInButton>
           )}
-        </div>
-
-        {/* Scroll to Features Button */}
-        <div 
-          className="flex justify-center"
-          style={{
-            opacity: isVisible ? 1 : 0,
-            transform: isVisible ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'all 2.2s cubic-bezier(0.16, 1, 0.3, 1) 1.3s',
-          }}
-        >
-          <Button
-            onClick={() => scrollToSection("features")}
-            variant="ghost"
-            size="sm"
-            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 flex flex-col items-center gap-1 px-4 py-2 rounded-lg transition-all duration-300 hover:bg-white/50 dark:hover:bg-slate-800/50"
-          >
-            <span className="text-sm font-medium">Learn More</span>
-            <ChevronDown className="h-4 w-4 animate-bounce" />
-          </Button>
         </div>
 
         {/* Decorative Gradient Elements */}

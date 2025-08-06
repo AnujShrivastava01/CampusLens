@@ -7,8 +7,6 @@ import { ThemeProvider } from "next-themes";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { PageTransition } from "@/components/PageTransition";
 import { Preloader } from "@/components/Preloader";
-import { LenisSmoothScrollProvider } from "@/contexts/LenisSmoothScrollContext";
-import LenisBackToTopButton from "@/components/LenisBackToTopButton";
 import Navbar from "@/components/Layout/Navbar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -18,8 +16,7 @@ import FileView from "./pages/FileView";
 import Developer from "./pages/Developer";
 import NotFound from "./pages/NotFound";
 import "@/styles/transitions.css";
-import { useState, useEffect } from "react";
-import { initMobileScrollFixes } from "@/utils/mobileScrollFix";
+import { useState } from "react";
 
 const queryClient = new QueryClient();
 
@@ -37,11 +34,6 @@ const App = () => {
     setIsLoading(false);
   };
 
-  // Initialize mobile scroll fixes
-  useEffect(() => {
-    initMobileScrollFixes();
-  }, []);
-
   if (isLoading) {
     return <Preloader onComplete={handlePreloaderComplete} />;
   }
@@ -51,13 +43,11 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <TooltipProvider>
-            <LenisSmoothScrollProvider>
-              <LenisBackToTopButton />
-              <Toaster />
-              <Sonner />
-              <BrowserRouter>
-                <Navbar />
-                <Routes>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Navbar />
+              <Routes>
                 <Route path="/" element={<PageTransition><Index /></PageTransition>} />
                 <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
                 <Route path="/students" element={<PageTransition><Students /></PageTransition>} />
@@ -68,7 +58,6 @@ const App = () => {
                 <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
               </Routes>
             </BrowserRouter>
-            </LenisSmoothScrollProvider>
           </TooltipProvider>
         </ThemeProvider>
       </QueryClientProvider>

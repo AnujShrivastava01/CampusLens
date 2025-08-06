@@ -6,8 +6,6 @@ import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-reac
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useLenisSmoothScroll } from "@/hooks/useLenisSmoothScroll";
-import { useMobileOptimizedScroll } from "@/hooks/useMobileScroll";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,8 +19,6 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { scrollToTop } = useLenisSmoothScroll();
-  const { scrollToTop: mobileScrollToTop, isOnMobile } = useMobileOptimizedScroll();
 
   useEffect(() => {
     setMounted(true);
@@ -44,15 +40,10 @@ const Navbar = () => {
               transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
             }}
             onClick={(e) => {
-              // If we're already on the home page, prevent navigation and use optimized scroll
+              // If we're already on the home page, prevent navigation and just scroll
               if (location.pathname === "/") {
                 e.preventDefault();
-                // Use mobile-optimized scroll on mobile devices to prevent sticking
-                if (isOnMobile()) {
-                  mobileScrollToTop();
-                } else {
-                  scrollToTop();
-                }
+                window.scrollTo({ top: 0, behavior: 'smooth' });
               }
             }}
             onMouseEnter={(e) => {
