@@ -23,6 +23,34 @@ import { useToast } from "@/components/ui/use-toast";
 import { useParams, useNavigate } from "react-router-dom";
 import { useUser, SignInButton, SignUpButton } from "@clerk/clerk-react";
 
+// Custom styles for better dropdown scrolling
+const dropdownStyles = `
+  .select-dropdown-content {
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
+  }
+  .select-dropdown-content::-webkit-scrollbar {
+    width: 6px;
+  }
+  .select-dropdown-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .select-dropdown-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+  }
+  .select-dropdown-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = dropdownStyles;
+  document.head.appendChild(styleElement);
+}
+
 interface FileData {
   students: Student[];
   pagination: {
@@ -467,7 +495,7 @@ const FileView = () => {
                       <SelectTrigger className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100">
                         <SelectValue placeholder={`Filter by ${header}`} />
                       </SelectTrigger>
-                      <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                      <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 max-h-[300px] select-dropdown-content">
                         <SelectItem value="ALL" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">All {header}</SelectItem>
                         {isLoadingUniqueValues ? (
                           <SelectItem value="LOADING" disabled className="text-gray-500 dark:text-gray-400">
@@ -485,7 +513,7 @@ const FileView = () => {
                               <SelectItem 
                                 key={stringValue} 
                                 value={stringValue}
-                                className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer"
                               >
                                 {stringValue}
                               </SelectItem>
