@@ -7,6 +7,8 @@ import { ThemeProvider } from "next-themes";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { PageTransition } from "@/components/PageTransition";
 import { Preloader } from "@/components/Preloader";
+import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import Navbar from "@/components/Layout/Navbar";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -43,21 +45,24 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-                <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
-                <Route path="/students" element={<PageTransition><Students /></PageTransition>} />
-                <Route path="/files" element={<PageTransition><Files /></PageTransition>} />
-                <Route path="/files/:fileId" element={<PageTransition><FileView /></PageTransition>} />
-                <Route path="/developer" element={<PageTransition><Developer /></PageTransition>} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-              </Routes>
-            </BrowserRouter>
+            <SmoothScrollProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+                  <Route path="/dashboard" element={<PageTransition><Dashboard /></PageTransition>} />
+                  <Route path="/students" element={<PageTransition><Students /></PageTransition>} />
+                  <Route path="/files" element={<PageTransition><Files /></PageTransition>} />
+                  <Route path="/files/:fileId" element={<PageTransition><FileView /></PageTransition>} />
+                  <Route path="/developer" element={<PageTransition><Developer /></PageTransition>} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+                </Routes>
+                <ScrollToTop />
+              </BrowserRouter>
+            </SmoothScrollProvider>
           </TooltipProvider>
         </ThemeProvider>
       </QueryClientProvider>

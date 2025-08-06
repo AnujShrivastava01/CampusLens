@@ -2,19 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Simple smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  overflow-x: hidden;
-}
-
 /* Performance optimizations */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Disable default smooth scrolling to allow Lenis to handle it */
+html {
+  scroll-behavior: auto;
+}
+
+/* Lenis smooth scrolling styles */
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
 
 /* Fixed Navbar Styles */
@@ -174,6 +191,7 @@ body {
     @apply bg-background text-foreground;
     background: white;
     min-height: 100vh;
+    overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
   
@@ -215,11 +233,6 @@ body {
   /* Hero Section */
   .hero-gradient {
     background: var(--gradient-hero);
-  }
-
-  /* Smooth Scroll */
-  html {
-    scroll-behavior: smooth;
   }
 
   /* Loading Animation */
