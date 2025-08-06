@@ -25,12 +25,12 @@ const Developer = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen relative overflow-hidden bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 dark:from-slate-950 dark:via-purple-950 dark:to-slate-950">
         {/* Animated Background Effects */}
         <div className="absolute inset-0">
           {/* Floating animated blobs */}
           <motion.div
-            className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-600/20 dark:from-blue-400/30 dark:to-purple-600/30 rounded-full blur-3xl"
+            className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/30 to-purple-600/30 rounded-full blur-3xl"
             animate={{
               x: [0, 100, -50, 0],
               y: [0, -100, 50, 0],
@@ -44,7 +44,7 @@ const Developer = () => {
           />
           
           <motion.div
-            className="absolute top-1/3 right-0 w-80 h-80 bg-gradient-to-r from-purple-500/15 to-pink-500/15 dark:from-purple-500/25 dark:to-pink-500/25 rounded-full blur-3xl"
+            className="absolute top-1/3 right-0 w-80 h-80 bg-gradient-to-r from-purple-500/25 to-pink-500/25 rounded-full blur-3xl"
             animate={{
               x: [0, -80, 30, 0],
               y: [0, 60, -40, 0],
@@ -59,7 +59,7 @@ const Developer = () => {
           />
           
           <motion.div
-            className="absolute bottom-0 left-1/3 w-72 h-72 bg-gradient-to-r from-cyan-400/10 to-blue-500/10 dark:from-cyan-400/20 dark:to-blue-500/20 rounded-full blur-2xl"
+            className="absolute bottom-0 left-1/3 w-72 h-72 bg-gradient-to-r from-cyan-400/20 to-blue-500/20 rounded-full blur-2xl"
             animate={{
               x: [0, 70, -90, 0],
               y: [0, -50, 80, 0],
@@ -74,7 +74,7 @@ const Developer = () => {
           />
           
           <motion.div
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-indigo-400/8 to-purple-400/8 dark:from-indigo-400/15 dark:to-purple-400/15 rounded-full blur-2xl"
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-indigo-400/15 to-purple-400/15 rounded-full blur-2xl"
             animate={{
               x: [0, -120, 60, 0],
               y: [0, 90, -70, 0],
@@ -89,11 +89,11 @@ const Developer = () => {
           />
           
           {/* Animated particles */}
-          <div className="absolute inset-0 opacity-30 dark:opacity-40">
+          <div className="absolute inset-0 opacity-40">
             {Array.from({ length: 50 }).map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1 h-1 bg-slate-400/30 dark:bg-white/20 rounded-full"
+                className="absolute w-1 h-1 bg-white/20 rounded-full"
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
@@ -112,8 +112,8 @@ const Developer = () => {
           </div>
           
           {/* Gradient mesh overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/3 to-transparent dark:via-purple-500/5 blur-sm" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/3 to-transparent dark:via-blue-500/5 blur-sm" />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/5 to-transparent blur-sm" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/5 to-transparent blur-sm" />
         </div>
 
         <div className="container mx-auto px-4 md:px-6 py-10 md:py-20 relative z-10">
@@ -130,7 +130,7 @@ const Developer = () => {
               whileHover={{ y: -5 }}
               transition={{ duration: 0.3 }}
             >
-              <Card className="bg-white/90 dark:bg-slate-800/20 backdrop-blur-xl border-slate-200/50 dark:border-white/20 shadow-2xl">
+              <Card className="bg-white/10 dark:bg-slate-800/20 backdrop-blur-xl border-white/20 dark:border-slate-600/30 shadow-2xl">
                 <CardContent className="p-4 md:p-8">
                   <div className="flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-8">
                     {/* Avatar Section */}
@@ -151,56 +151,46 @@ const Developer = () => {
                             alt="Anuj Shrivastava"
                             className="w-full h-full rounded-lg object-cover"
                             style={{ filter: isImageRevealed ? "blur(0px)" : "blur(8px)" }}
-                            animate={{ 
-                              filter: isImageRevealed ? "blur(0px)" : "blur(8px)"
-                            }}
-                            transition={{ 
-                              duration: 0.6, 
-                              ease: [0.4, 0, 0.2, 1] // Smooth cubic-bezier
-                            }}
+                            transition={{ duration: 0.5 }}
                           />
                           
-                          {/* Click indicator overlay when blurred */}
                           {!isImageRevealed && (
                             <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-lg"
-                              initial={{ opacity: 0.8 }}
-                              animate={{ 
-                                opacity: [0.6, 1, 0.6],
-                                scale: [1, 1.02, 1]
-                              }}
-                              transition={{ 
-                                duration: 2, 
-                                repeat: Infinity,
-                                ease: "easeInOut"
-                              }}
+                              className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-lg"
+                              initial={{ opacity: 1 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                            >
+                              <motion.div
+                                className="text-white text-sm font-medium bg-black/40 px-3 py-1 rounded-full"
+                                animate={{ scale: [1, 1.05, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                              >
+                                👀 Click to reveal
+                              </motion.div>
+                            </motion.div>
+                          )}
+                          
+                          {/* Online Status Indicator */}
+                          {isImageRevealed && (
+                            <motion.div
+                              className="absolute bottom-2 right-2 w-4 h-4 bg-green-400 rounded-full border-2 border-white"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ delay: 0.5, type: "spring" }}
                             />
                           )}
                           
-                          {/* Sparkle Effect when revealed */}
+                          {/* GitHub Contributions Effect */}
                           {isImageRevealed && (
                             <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-500/20 rounded-lg"
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: [0, 1, 0], scale: [0.8, 1.1, 1] }}
-                              transition={{ 
-                                duration: 1.2,
-                                ease: "easeOut"
-                              }}
-                            />
-                          )}
-                          
-                          {/* Shimmer effect on reveal */}
-                          {isImageRevealed && (
-                            <motion.div
-                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-lg"
-                              initial={{ x: "-100%" }}
-                              animate={{ x: "200%" }}
-                              transition={{ 
-                                duration: 0.8,
-                                ease: "easeInOut"
-                              }}
-                            />
+                              className="absolute top-2 left-2 text-xs text-white bg-black/50 px-2 py-1 rounded"
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.3 }}
+                            >
+                              🔥 Online
+                            </motion.div>
                           )}
                         </div>
                       </motion.div>
@@ -209,7 +199,7 @@ const Developer = () => {
                     {/* Info Section */}
                     <div className="flex-1 text-center md:text-left">
                       <motion.h1
-                        className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-2"
+                        className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent mb-2"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.2 }}
@@ -223,8 +213,8 @@ const Developer = () => {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
                       >
-                        <Code className="w-5 h-5 text-blue-500" />
-                        <span className="text-slate-700 dark:text-slate-300 font-medium">Full-Stack Developer</span>
+                        <Code className="w-5 h-5 text-blue-400" />
+                        <span className="text-slate-300 font-medium">Full-Stack Developer</span>
                       </motion.div>
                       
                       <motion.div
@@ -233,8 +223,8 @@ const Developer = () => {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.6 }}
                       >
-                        <Brain className="w-5 h-5 text-purple-500" />
-                        <span className="text-slate-700 dark:text-slate-300 font-medium">AI Enthusiast</span>
+                        <Brain className="w-5 h-5 text-purple-400" />
+                        <span className="text-slate-300 font-medium">AI Enthusiast</span>
                       </motion.div>
 
                       {/* Social Links */}
@@ -247,7 +237,7 @@ const Developer = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="bg-white/50 dark:bg-white/10 border-slate-300 dark:border-white/20 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/20 hover:border-slate-400 dark:hover:border-white/30"
+                          className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
                           onClick={() => window.open('https://github.com/AnujShrivastava01', '_blank')}
                         >
                           <Github className="w-4 h-4 mr-2" />
@@ -258,7 +248,7 @@ const Developer = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="bg-white/50 dark:bg-white/10 border-slate-300 dark:border-white/20 text-slate-700 dark:text-white hover:bg-slate-100 dark:hover:bg-white/20 hover:border-slate-400 dark:hover:border-white/30"
+                          className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
                           onClick={() => window.open('https://linkedin.com/in/anuj-shrivastava01', '_blank')}
                         >
                           <Linkedin className="w-4 h-4 mr-2" />
@@ -280,7 +270,7 @@ const Developer = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="max-w-4xl mx-auto mb-16"
           >
-            <Card className="bg-white/90 dark:bg-slate-800/20 backdrop-blur-xl border-slate-200/50 dark:border-white/20 shadow-2xl">
+            <Card className="bg-white/10 dark:bg-slate-800/20 backdrop-blur-xl border-white/20 dark:border-slate-600/30 shadow-2xl">
               <CardContent className="p-6 md:p-8">
                 <motion.div
                   className="text-center mb-8"
@@ -289,17 +279,17 @@ const Developer = () => {
                   transition={{ delay: 0.4 }}
                 >
                   <div className="flex items-center justify-center space-x-2 mb-4">
-                    <Heart className="w-6 h-6 text-red-500" />
-                    <h2 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">
+                    <Heart className="w-6 h-6 text-red-400" />
+                    <h2 className="text-2xl md:text-3xl font-bold text-white">
                       Why I Built CampusLens
                     </h2>
-                    <Heart className="w-6 h-6 text-red-500" />
+                    <Heart className="w-6 h-6 text-red-400" />
                   </div>
-                  <Sparkles className="w-8 h-8 text-yellow-500 mx-auto animate-pulse" />
+                  <Sparkles className="w-8 h-8 text-yellow-400 mx-auto animate-pulse" />
                 </motion.div>
 
                 <motion.p
-                  className="text-slate-700 dark:text-slate-300 text-base md:text-lg leading-relaxed text-center"
+                  className="text-slate-300 text-base md:text-lg leading-relaxed text-center"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
@@ -311,15 +301,15 @@ const Developer = () => {
                 </motion.p>
 
                 <motion.p
-                  className="text-slate-700 dark:text-slate-300 text-base md:text-lg leading-relaxed text-center mt-6"
+                  className="text-slate-300 text-base md:text-lg leading-relaxed text-center mt-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.8 }}
                 >
-                  To streamline this process, I built <span className="text-blue-600 dark:text-blue-400 font-semibold">CampusLens</span> — a simple and efficient solution to store and access 
-                  Excel data online. With an intuitive interface, powerful search capabilities, and mobile-friendly design, 
+                  To streamline this process, I built <span className="text-blue-400 font-semibold">CampusLens</span> — a simple and efficient solution to store and access 
+                  student data online. With an intuitive interface, powerful search capabilities, and mobile-friendly design, 
                   I can now find any information instantly, from anywhere. What used to take minutes now takes 
-                  seconds, making data management seamless and productive. 
+                  seconds, making data management seamless and productive.
                 </motion.p>
               </CardContent>
             </Card>
@@ -332,10 +322,10 @@ const Developer = () => {
             transition={{ duration: 0.8, delay: 0.4 }}
             className="max-w-4xl mx-auto"
           >
-            <Card className="bg-white/90 dark:bg-slate-800/20 backdrop-blur-xl border-slate-200/50 dark:border-white/20 shadow-2xl">
+            <Card className="bg-white/10 dark:bg-slate-800/20 backdrop-blur-xl border-white/20 dark:border-slate-600/30 shadow-2xl">
               <CardContent className="p-6 md:p-8">
                 <motion.h3
-                  className="text-2xl md:text-3xl font-bold text-center text-slate-800 dark:text-white mb-8"
+                  className="text-2xl md:text-3xl font-bold text-center text-white mb-8"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.6 }}
@@ -345,13 +335,13 @@ const Developer = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <motion.div
-                    className="bg-slate-50/80 dark:bg-white/5 rounded-lg p-6 border border-slate-200/50 dark:border-white/10"
+                    className="bg-white/5 rounded-lg p-6 border border-white/10"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.8 }}
                   >
-                    <h4 className="text-blue-600 dark:text-blue-400 font-semibold text-lg mb-4">Frontend</h4>
-                    <ul className="text-slate-700 dark:text-slate-300 space-y-2">
+                    <h4 className="text-blue-400 font-semibold text-lg mb-4">Frontend</h4>
+                    <ul className="text-slate-300 space-y-2">
                       <li>• React + TypeScript</li>
                       <li>• Vite for blazing fast builds</li>
                       <li>• Tailwind CSS + Shadcn/ui</li>
@@ -361,13 +351,13 @@ const Developer = () => {
                   </motion.div>
 
                   <motion.div
-                    className="bg-slate-50/80 dark:bg-white/5 rounded-lg p-6 border border-slate-200/50 dark:border-white/10"
+                    className="bg-white/5 rounded-lg p-6 border border-white/10"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1.0 }}
                   >
-                    <h4 className="text-purple-600 dark:text-purple-400 font-semibold text-lg mb-4">Backend</h4>
-                    <ul className="text-slate-700 dark:text-slate-300 space-y-2">
+                    <h4 className="text-purple-400 font-semibold text-lg mb-4">Backend</h4>
+                    <ul className="text-slate-300 space-y-2">
                       <li>• Node.js + Express.js</li>
                       <li>• MongoDB with Mongoose</li>
                       <li>• Clerk for authentication</li>
@@ -377,13 +367,13 @@ const Developer = () => {
                   </motion.div>
 
                   <motion.div
-                    className="bg-slate-50/80 dark:bg-white/5 rounded-lg p-6 border border-slate-200/50 dark:border-white/10"
+                    className="bg-white/5 rounded-lg p-6 border border-white/10"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1.2 }}
                   >
-                    <h4 className="text-green-600 dark:text-green-400 font-semibold text-lg mb-4">Features</h4>
-                    <ul className="text-slate-700 dark:text-slate-300 space-y-2">
+                    <h4 className="text-green-400 font-semibold text-lg mb-4">Features</h4>
+                    <ul className="text-slate-300 space-y-2">
                       <li>• Excel file upload & parsing</li>
                       <li>• Advanced search & filtering</li>
                       <li>• Real-time data visualization</li>
@@ -393,13 +383,13 @@ const Developer = () => {
                   </motion.div>
 
                   <motion.div
-                    className="bg-slate-50/80 dark:bg-white/5 rounded-lg p-6 border border-slate-200/50 dark:border-white/10"
+                    className="bg-white/5 rounded-lg p-6 border border-white/10"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 1.4 }}
                   >
-                    <h4 className="text-yellow-600 dark:text-yellow-400 font-semibold text-lg mb-4">Deployment</h4>
-                    <ul className="text-slate-700 dark:text-slate-300 space-y-2">
+                    <h4 className="text-yellow-400 font-semibold text-lg mb-4">Deployment</h4>
+                    <ul className="text-slate-300 space-y-2">
                       <li>• Frontend: Vercel</li>
                       <li>• Backend: Render.com</li>
                       <li>• Database: MongoDB Atlas</li>
@@ -415,7 +405,7 @@ const Developer = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1.6 }}
                 >
-                  <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">
+                  <p className="text-slate-400 text-sm mb-4">
                     Built with ❤️ for efficiency and simplicity
                   </p>
                   <Button
