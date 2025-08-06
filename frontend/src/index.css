@@ -2,8 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Simple smooth scrolling */
+/* Enhanced smooth scrolling with Lenis integration */
 html {
+  scroll-behavior: smooth;
+}
+
+/* Override for Lenis when active */
+html.lenis {
+  scroll-behavior: auto;
+}
+
+/* Lenis scroll optimization */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+html.lenis body {
+  overflow: hidden;
+}
+
+/* Fallback for when Lenis is not active */
+html:not(.lenis) {
   scroll-behavior: smooth;
 }
 
