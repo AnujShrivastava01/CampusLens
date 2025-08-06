@@ -13,8 +13,8 @@ html {
   scroll-behavior: auto;
 }
 
-/* Lenis smooth scrolling styles */
-html.lenis {
+/* Lenis smooth scrolling styles - Global setup */
+html.lenis, html.lenis body {
   height: auto;
 }
 
@@ -27,6 +27,10 @@ html.lenis {
 }
 
 .lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-stopped body {
   overflow: hidden;
 }
 
@@ -193,6 +197,8 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
+    /* Ensure Lenis can handle scrolling */
+    overscroll-behavior: none;
   }
   
   .dark body {
