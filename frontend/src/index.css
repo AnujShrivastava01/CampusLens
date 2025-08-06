@@ -278,6 +278,115 @@ body {
   z-index: 10001 !important;
 }
 
+/* Clerk UserButton Mobile Customization */
+@media (max-width: 767px) {
+  .cl-userButtonPopoverCard {
+    width: 280px !important;
+    max-width: 90vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    top: 4rem !important; /* Position below navbar */
+  }
+  
+  .cl-popoverCard {
+    width: 280px !important;
+    max-width: 90vw !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    top: 4rem !important; /* Position below navbar */
+  }
+  
+  /* Center the popover arrow and adjust its position */
+  .cl-userButtonPopoverCard::before,
+  .cl-popoverCard::before,
+  .cl-userButtonPopoverCard::after,
+  .cl-popoverCard::after {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+  }
+  
+  /* Adjust the popover content for better mobile experience */
+  .cl-userButtonPopoverCard .cl-userButtonPopoverMain,
+  .cl-popoverCard .cl-userButtonPopoverMain {
+    padding: 1rem !important;
+  }
+  
+  /* Reduce avatar size in mobile popover */
+  .cl-userButtonPopoverCard .cl-userPreview .cl-userPreviewAvatarContainer,
+  .cl-popoverCard .cl-userPreview .cl-userPreviewAvatarContainer {
+    width: 3rem !important;
+    height: 3rem !important;
+  }
+  
+  /* Adjust text sizes for mobile */
+  .cl-userButtonPopoverCard .cl-userPreview .cl-userPreviewTextContainer,
+  .cl-popoverCard .cl-userPreview .cl-userPreviewTextContainer {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Ensure proper spacing for mobile */
+  .cl-userButtonPopoverCard .cl-userButtonPopoverActions,
+  .cl-popoverCard .cl-userButtonPopoverActions {
+    padding-top: 0.75rem !important;
+  }
+  
+  /* Force center positioning for any Clerk popover on mobile */
+  [data-localization-key] .cl-popoverCard,
+  .cl-userButtonPopoverCard {
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Additional fallback for Clerk modal positioning */
+  .cl-modalContent {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 280px !important;
+    max-width: 90vw !important;
+  }
+  
+  /* Override any absolute positioning on mobile */
+  .cl-userButtonPopover {
+    position: relative !important;
+  }
+  
+  .cl-userButtonPopover .cl-popoverCard {
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    top: 4rem !important;
+  }
+  
+  /* Compact layout for mobile */
+  .cl-userButtonPopoverCard .cl-userPreview,
+  .cl-popoverCard .cl-userPreview {
+    padding: 0.75rem !important;
+    gap: 0.75rem !important;
+  }
+  
+  /* Smaller action buttons on mobile */
+  .cl-userButtonPopoverCard .cl-userButtonPopoverActionButton,
+  .cl-popoverCard .cl-userButtonPopoverActionButton {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+  
+  /* Ensure popover doesn't go off-screen */
+  .cl-userButtonPopoverCard,
+  .cl-popoverCard {
+    max-height: calc(100vh - 6rem) !important;
+    overflow-y: auto !important;
+  }
+}
+
 /* Toast and Notification z-index fixes */
 /* Radix UI Toast Viewport */
 [data-radix-toast-viewport] {
