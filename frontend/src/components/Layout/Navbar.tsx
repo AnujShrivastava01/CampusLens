@@ -1,16 +1,24 @@
 import { Button } from "@/components/ui/button";
-import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadsheet, User, LucideIcon } from "lucide-react";
+import { MoonIcon, SunIcon, Upload, Users, Home, LayoutDashboard, FileSpreadsheet, User, LucideIcon, Menu, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useState, useEffect } from "react";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     setMounted(true);
@@ -98,7 +106,72 @@ const Navbar = () => {
               </SignInButton>
             </SignedOut>
             <SignedIn>
-              <UserButton afterSignOutUrl="/" />
+              <div className="relative z-[10001]">
+                <UserButton afterSignOutUrl="/" />
+              </div>
+              
+              {/* Mobile Hamburger Menu */}
+              {isMobile && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="ml-2 transition-all duration-300 hover:bg-accent/50 relative z-[10001]"
+                    >
+                      <Menu className="h-5 w-5" />
+                      <span className="sr-only">Open navigation menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="dropdown-menu-content w-56 mt-2 bg-background/95 backdrop-blur-md border border-border/20 shadow-lg z-[10000]"
+                  >
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/dashboard"
+                        className={cn(
+                          "mobile-menu-item flex items-center w-full px-3 py-2 text-sm transition-colors duration-200",
+                          location.pathname === "/dashboard"
+                            ? "bg-accent text-accent-foreground"
+                            : "hover:bg-accent/50 hover:text-accent-foreground"
+                        )}
+                      >
+                        <LayoutDashboard className="h-4 w-4 mr-3" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/files"
+                        className={cn(
+                          "mobile-menu-item flex items-center w-full px-3 py-2 text-sm transition-colors duration-200",
+                          location.pathname === "/files"
+                            ? "bg-accent text-accent-foreground"
+                            : "hover:bg-accent/50 hover:text-accent-foreground"
+                        )}
+                      >
+                        <FileSpreadsheet className="h-4 w-4 mr-3" />
+                        Files
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        to="/developer"
+                        className={cn(
+                          "mobile-menu-item flex items-center w-full px-3 py-2 text-sm transition-colors duration-200",
+                          location.pathname === "/developer"
+                            ? "bg-accent text-accent-foreground"
+                            : "hover:bg-accent/50 hover:text-accent-foreground"
+                        )}
+                      >
+                        <User className="h-4 w-4 mr-3" />
+                        Developer
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </SignedIn>
           </div>
         </div>

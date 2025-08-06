@@ -228,3 +228,119 @@ body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Mobile Dropdown Menu Animations */
+@keyframes dropdown-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdown-slide-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+/* Enhanced Dropdown Menu Styles */
+.dropdown-menu-content {
+  animation-duration: 200ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10000 !important;
+}
+
+.dropdown-menu-content[data-state="open"] {
+  animation-name: dropdown-slide-in;
+}
+
+.dropdown-menu-content[data-state="closed"] {
+  animation-name: dropdown-slide-out;
+}
+
+/* Ensure dropdown portal has higher z-index than navbar */
+[data-radix-popper-content-wrapper] {
+  z-index: 10000 !important;
+}
+
+/* Clerk UserButton z-index fix */
+.cl-userButtonPopoverCard,
+.cl-popoverCard {
+  z-index: 10001 !important;
+}
+
+/* Toast and Notification z-index fixes */
+/* Radix UI Toast Viewport */
+[data-radix-toast-viewport] {
+  z-index: 10002 !important;
+}
+
+/* Sonner Toast Container */
+.toaster {
+  z-index: 10002 !important;
+}
+
+/* Sonner individual toasts */
+.toaster .toast {
+  z-index: 10002 !important;
+}
+
+/* General toast components */
+.toast-viewport {
+  z-index: 10002 !important;
+}
+
+/* Alert and notification components */
+.alert {
+  z-index: 10002 !important;
+}
+
+/* Success/Error notification alerts */
+.notification-alert {
+  z-index: 10002 !important;
+}
+
+/* Alert Dialog Components */
+[data-radix-alert-dialog-overlay] {
+  z-index: 10003 !important;
+}
+
+[data-radix-alert-dialog-content] {
+  z-index: 10003 !important;
+}
+
+/* Dialog Components */
+[data-radix-dialog-overlay] {
+  z-index: 10003 !important;
+}
+
+[data-radix-dialog-content] {
+  z-index: 10003 !important;
+}
+
+/* Any other modal or overlay components */
+.modal,
+.overlay,
+.notification,
+.popup {
+  z-index: 10002 !important;
+}
+
+/* Mobile Menu Item Hover Effects */
+.mobile-menu-item {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-menu-item:hover {
+  transform: translateX(4px);
+  background: var(--accent);
+}
