@@ -283,24 +283,144 @@ body {
   z-index: 10001 !important;
 }
 
+/* Global Clerk Modal Centering - Clean Solution */
+.cl-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 10004 !important;
+}
+
+.cl-modalBackdrop {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 10004 !important;
+}
+
+/* Target all Clerk modal content */
+.cl-modalContent,
+.cl-card,
+.cl-componentCard,
+.cl-signIn-root,
+.cl-signUp-root {
+  position: relative !important;
+  margin: 0 auto !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  max-width: 400px !important;
+  width: 100% !important;
+}
+
+/* Ensure consistent width for all Clerk modal sections */
+.cl-card .cl-main,
+.cl-card .cl-footer,
+.cl-componentCard .cl-main,
+.cl-componentCard .cl-footer,
+.cl-modalContent > div,
+.cl-signIn-root > div,
+.cl-signUp-root > div {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Make sure all internal sections have consistent width */
+.cl-card > *,
+.cl-componentCard > *,
+.cl-modalContent > * {
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Position the close button to top-right */
+.cl-modalCloseButton,
+.cl-card .cl-modalCloseButton,
+.cl-componentCard .cl-modalCloseButton {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  z-index: 20 !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 6px !important;
+  border-radius: 4px !important;
+  transition: background-color 0.2s ease !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-shrink: 0 !important;
+  min-width: 32px !important;
+  max-width: 32px !important;
+  box-sizing: border-box !important;
+}
+
+.cl-modalCloseButton:hover,
+.cl-card .cl-modalCloseButton:hover,
+.cl-componentCard .cl-modalCloseButton:hover {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ensure the close button icon is properly sized */
+.cl-modalCloseButton svg,
+.cl-card .cl-modalCloseButton svg,
+.cl-componentCard .cl-modalCloseButton svg {
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Ensure Clerk overlay containers center their content */
+[data-portal] .cl-modal,
+[data-portal] .cl-modalBackdrop,
+.cl-internal-b3fm6y {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* Clerk UserButton Mobile Customization */
 @media (max-width: 767px) {
-  .cl-userButtonPopoverCard {
-    width: 280px !important;
-    max-width: 90vw !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    right: auto !important;
-    top: 4rem !important; /* Position below navbar */
-  }
-  
+  /* UserButton Popover positioning */
+  .cl-userButtonPopoverCard,
   .cl-popoverCard {
     width: 280px !important;
     max-width: 90vw !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
     right: auto !important;
-    top: 4rem !important; /* Position below navbar */
+    top: 4rem !important;
+  }
+  
+  /* Modal centering for mobile */
+  .cl-modal,
+  .cl-modalBackdrop {
+    padding: 1rem !important;
+  }
+  
+  .cl-modalContent,
+  .cl-card,
+  .cl-componentCard {
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+    position: relative !important;
   }
   
   /* Center the popover arrow and adjust its position */
@@ -347,14 +467,6 @@ body {
     right: auto !important;
     margin-left: 0 !important;
     margin-right: 0 !important;
-  }
-  
-  /* Additional fallback for Clerk modal positioning */
-  .cl-modalContent {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 280px !important;
-    max-width: 90vw !important;
   }
   
   /* Override any absolute positioning on mobile */
