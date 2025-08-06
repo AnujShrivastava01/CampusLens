@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowUp } from "lucide-react";
-import { useLenisSmoothScroll } from "@/contexts/LenisSmoothScrollContext";
+import { useLenisSmoothScroll } from "@/hooks/useLenisSmoothScroll";
 
 const LenisBackToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);

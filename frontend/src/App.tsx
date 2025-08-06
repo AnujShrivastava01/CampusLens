@@ -18,7 +18,8 @@ import FileView from "./pages/FileView";
 import Developer from "./pages/Developer";
 import NotFound from "./pages/NotFound";
 import "@/styles/transitions.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { initMobileScrollFixes } from "@/utils/mobileScrollFix";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,11 @@ const App = () => {
   const handlePreloaderComplete = () => {
     setIsLoading(false);
   };
+
+  // Initialize mobile scroll fixes
+  useEffect(() => {
+    initMobileScrollFixes();
+  }, []);
 
   if (isLoading) {
     return <Preloader onComplete={handlePreloaderComplete} />;

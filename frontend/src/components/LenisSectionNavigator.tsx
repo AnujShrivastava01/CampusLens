@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Home, Layers, Menu } from "lucide-react";
-import { useLenisSmoothScroll } from "@/contexts/LenisSmoothScrollContext";
+import { useLenisSmoothScroll } from "@/hooks/useLenisSmoothScroll";
 import { useLocation } from "react-router-dom";
 
 interface Section {

@@ -17,7 +17,7 @@ const LenisSmoothScrollContext = createContext<LenisSmoothScrollContextType>({
   isReady: false,
 });
 
-export const useLenisSmoothScroll = () => useContext(LenisSmoothScrollContext);
+export { LenisSmoothScrollContext };
 
 interface LenisSmoothScrollProviderProps {
   children: ReactNode;
@@ -29,25 +29,51 @@ export const LenisSmoothScrollProvider = ({ children }: LenisSmoothScrollProvide
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Check if device is mobile - more comprehensive detection
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                     window.innerWidth < 768 || 
-                     ('ontouchstart' in window) || 
-                     (navigator.maxTouchPoints > 0);
+    // Enhanced mobile detection for better scroll handling
+    const isMobileDevice = () => {
+      // Check user agent
+      const userAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      // Check screen size
+      const isSmallScreen = window.innerWidth < 768;
+      
+      // Check touch capabilities
+      const hasTouchScreen = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      
+      // Check if it's a mobile viewport
+      const isMobileViewport = window.matchMedia('(max-width: 767px)').matches;
+      
+      // Additional check for mobile browsers
+      const isMobileBrowser = /Mobi|Android/i.test(navigator.userAgent);
+      
+      return userAgent || isSmallScreen || hasTouchScreen || isMobileViewport || isMobileBrowser;
+    };
     
-    // Skip Lenis initialization on mobile devices for better touch scrolling and pull-to-refresh
+    const isMobile = isMobileDevice();
+    
+    // Skip Lenis initialization on mobile devices for better native scrolling
     if (isMobile) {
-      console.log('Mobile device detected - using native scroll with pull-to-refresh support');
+      console.log('Mobile device detected - using native scroll for optimal touch experience');
       setIsReady(true);
-      // Ensure no lenis class is added on mobile
+      // Force remove lenis class on mobile to prevent conflicts
       document.documentElement.classList.remove('lenis');
+      
+      // Ensure mobile-friendly CSS is applied
+      document.body.style.overflow = 'auto';
+      document.body.style.touchAction = 'pan-y';
+      // Safely set webkit overflow scrolling for iOS
+      const bodyStyle = document.body.style as CSSStyleDeclaration & {
+        webkitOverflowScrolling?: string;
+      };
+      bodyStyle.webkitOverflowScrolling = 'touch';
+      
       return;
     }
 
-    // Add a small delay to ensure DOM is fully loaded
+    // Add a small delay to ensure DOM is fully loaded (desktop only)
     const initTimer = setTimeout(() => {
       try {
-        // Initialize Lenis with minimal settings for desktop only
+        // Initialize Lenis with optimized settings for desktop only
         const lenis = new Lenis({
           duration: 1.2,
           easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -110,26 +136,44 @@ export const LenisSmoothScrollProvider = ({ children }: LenisSmoothScrollProvide
   }, []);
 
   const scrollTo = (target: string | number, options?: Record<string, unknown>) => {
-    // Comprehensive mobile detection - always use native scroll on mobile for best experience
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                     window.innerWidth < 768 || 
-                     ('ontouchstart' in window) || 
-                     (navigator.maxTouchPoints > 0);
+    // Enhanced mobile detection for consistent behavior
+    const isMobileDevice = () => {
+      const userAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isSmallScreen = window.innerWidth < 768;
+      const hasTouchScreen = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      const isMobileViewport = window.matchMedia('(max-width: 767px)').matches;
+      return userAgent || isSmallScreen || hasTouchScreen || isMobileViewport;
+    };
     
+    const isMobile = isMobileDevice();
+    
+    // Always use native scroll on mobile for best touch experience
     if (isMobile || !lenisRef.current || !isReady) {
-      // Use native smooth scroll as fallback
       if (typeof target === 'string') {
         const element = document.querySelector(target);
         if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // Force native scroll with enhanced mobile support
+          element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          });
         }
       } else {
-        window.scrollTo({ top: target, behavior: 'smooth' });
+        // Use requestAnimationFrame for smoother mobile scrolling
+        const scrollToPosition = () => {
+          window.scrollTo({ 
+            top: target, 
+            behavior: 'smooth',
+            left: 0
+          });
+        };
+        requestAnimationFrame(scrollToPosition);
       }
       return;
     }
 
-    // Use Lenis for desktop
+    // Use Lenis for desktop only
     try {
       lenisRef.current.scrollTo(target, {
         duration: 1.0,
@@ -152,15 +196,30 @@ export const LenisSmoothScrollProvider = ({ children }: LenisSmoothScrollProvide
   };
 
   const scrollToTop = () => {
-    // Always use native scroll for mobile-friendly experience
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Always use native scroll for consistent mobile experience
+    const scrollToTopPosition = () => {
+      window.scrollTo({ 
+        top: 0, 
+        behavior: 'smooth',
+        left: 0
+      });
+    };
+    requestAnimationFrame(scrollToTopPosition);
   };
 
   const scrollToSection = (sectionId: string) => {
     // Always use native scroll for mobile-friendly experience
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Use enhanced native scrolling
+      const scrollToElement = () => {
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start',
+          inline: 'nearest'
+        });
+      };
+      requestAnimationFrame(scrollToElement);
     }
   };
 

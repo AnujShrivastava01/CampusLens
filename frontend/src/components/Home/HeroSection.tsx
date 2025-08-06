@@ -3,7 +3,7 @@ import { ArrowRight, Database, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SignInButton, useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
-import { useLenisSmoothScroll } from "@/contexts/LenisSmoothScrollContext";
+import { useLenisSmoothScroll } from "@/hooks/useLenisSmoothScroll";
 
 const HeroSection = () => {
   const navigate = useNavigate();

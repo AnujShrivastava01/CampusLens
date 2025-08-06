@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLenisSmoothScroll } from "@/contexts/LenisSmoothScrollContext";
+import { useLenisSmoothScroll } from "@/hooks/useLenisSmoothScroll";
 
 const LenisScrollProgressIndicator = () => {
   const [scrollProgress, setScrollProgress] = useState(0);

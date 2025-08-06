@@ -2,77 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Enhanced smooth scrolling with Lenis integration */
+/* Enhanced smooth scrolling with mobile optimization */
 html {
   scroll-behavior: smooth;
-  /* Ensure pull-to-refresh works on all devices */
   overscroll-behavior-y: auto;
 }
 
-/* Override for Lenis when active on desktop only */
-html.lenis {
-  scroll-behavior: auto;
-}
-
+/* Desktop-only Lenis optimization */
 @media (min-width: 768px) {
   html.lenis {
     scroll-behavior: auto;
   }
-}
-
-/* Ensure mobile devices always have native behavior */
-@media (max-width: 767px) {
-  html {
-    scroll-behavior: smooth;
-    overscroll-behavior-y: auto !important;
-  }
   
-  html.lenis {
-    scroll-behavior: smooth !important;
-    overscroll-behavior-y: auto !important;
-  }
-}
-
-/* Lenis scroll optimization - Mobile friendly */
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-/* Only apply overflow hidden on desktop, not mobile */
-@media (min-width: 768px) {
   html.lenis body {
     overflow: hidden;
   }
 }
 
-/* Enhanced mobile scrolling support */
+/* Mobile-first approach - always use native scrolling on mobile */
 @media (max-width: 767px) {
-  html.lenis body {
+  html, html.lenis {
+    scroll-behavior: smooth !important;
+    overscroll-behavior-y: auto !important;
+    /* Prevent scroll sticking on mobile */
+    touch-action: pan-y !important;
+  }
+  
+  body, html.lenis body {
     overflow-y: auto !important;
-    overflow-x: hidden;
-    /* Enable momentum scrolling on iOS */
-    -webkit-overflow-scrolling: touch;
-    /* Allow pull-to-refresh on mobile */
-    overscroll-behavior-y: auto;
+    overflow-x: hidden !important;
+    /* iOS momentum scrolling */
+    -webkit-overflow-scrolling: touch !important;
+    /* Allow pull-to-refresh */
+    overscroll-behavior-y: auto !important;
+    /* Prevent scroll sticking */
+    touch-action: pan-y !important;
+    /* Ensure height doesn't cause issues */
+    height: auto !important;
+    min-height: 100vh;
   }
   
-  /* Ensure touch events work properly and allow pull-to-refresh */
-  html.lenis {
-    touch-action: pan-y;
-    overscroll-behavior-y: auto;
-  }
-}
-
-/* Also ensure non-Lenis mobile devices support pull-to-refresh */
-@media (max-width: 767px) {
-  html:not(.lenis) {
-    overscroll-behavior-y: auto;
-  }
-  
-  html:not(.lenis) body {
-    overscroll-behavior-y: auto;
-    -webkit-overflow-scrolling: touch;
+  /* Force remove any Lenis transformations on mobile */
+  html.lenis body {
+    transform: none !important;
+    position: static !important;
   }
 }
 
@@ -83,16 +56,42 @@ html:not(.lenis) {
 
 body {
   overflow-x: hidden !important;
-  /* Ensure touch scrolling works on iOS */
+  /* iOS momentum scrolling */
   -webkit-overflow-scrolling: touch;
   /* Allow pull-to-refresh behavior on mobile */
   overscroll-behavior-y: auto;
+  /* Prevent scroll sticking */
+  touch-action: pan-y;
 }
 
 /* Prevent horizontal scroll globally */
 html, body {
   max-width: 100vw;
   overflow-x: hidden !important;
+}
+
+/* Mobile-specific scroll optimizations */
+@media (max-width: 767px) {
+  /* Ensure all elements support proper touch scrolling */
+  *, *::before, *::after {
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+  }
+  
+  /* Fix for elements that might interfere with scrolling */
+  .fixed, [style*="position: fixed"] {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+  
+  /* Prevent scroll sticking on overlays */
+  [data-radix-popper-content-wrapper],
+  [data-radix-portal],
+  .cl-modal,
+  .cl-modalBackdrop,
+  .cl-card {
+    touch-action: pan-y !important;
+  }
 }
 
 /* Ensure all containers don't cause horizontal scroll */

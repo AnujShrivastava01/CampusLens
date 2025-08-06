@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLenisSmoothScroll } from "@/contexts/LenisSmoothScrollContext";
+import { useLenisSmoothScroll } from "@/hooks/useLenisSmoothScroll";
 import { useLocation } from "react-router-dom";
 
 const SimpleSectionNavigator = () => {
