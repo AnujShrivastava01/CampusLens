@@ -9,12 +9,20 @@ html {
 
 body {
   overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Prevent horizontal scroll globally */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* Performance optimizations */
 * {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 }
 
 /* Fixed Navbar Styles */
@@ -183,6 +191,20 @@ body {
 }
 
 @layer components {
+  /* Global container constraints */
+  * {
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+  
+  /* Prevent any element from exceeding viewport width */
+  body > *,
+  #root,
+  #root > * {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
   /* Glassmorphism Effects */
   .glass {
     background: var(--gradient-glass);
@@ -283,8 +305,106 @@ body {
   z-index: 10001 !important;
 }
 
+/* Clerk Sign-in Modal Centering and Scroll Prevention */
+.cl-modalBackdrop {
+  z-index: 10000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+}
+
+.cl-modalContent {
+  position: relative !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 0 auto !important;
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+  width: auto !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.cl-card {
+  width: 100% !important;
+  max-width: 400px !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+}
+
+/* Prevent body scroll when modal is open */
+body.cl-modal-open {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Sign-in/Sign-up Modal specific fixes */
+.cl-signIn-start,
+.cl-signUp-start {
+  max-width: 400px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+/* Prevent horizontal overflow in modal content */
+.cl-formContainer,
+.cl-socialButtons,
+.cl-formFieldRow {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+}
+
+
+
 /* Clerk UserButton Mobile Customization */
 @media (max-width: 767px) {
+  /* Sign-in Modal Mobile Centering */
+  .cl-modalBackdrop {
+    padding: 0.5rem !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .cl-modalContent {
+    max-width: 95vw !important;
+    max-height: 95vh !important;
+    width: auto !important;
+    margin: 0 auto !important;
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+ 
   .cl-userButtonPopoverCard {
     width: 280px !important;
     max-width: 90vw !important;
@@ -351,10 +471,16 @@ body {
   
   /* Additional fallback for Clerk modal positioning */
   .cl-modalContent {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 280px !important;
-    max-width: 90vw !important;
+    left: auto !important;
+    transform: none !important;
+    width: auto !important;
+    max-width: 95vw !important;
+    margin: 0 auto !important;
+    position: relative !important;
+    top: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
   
   /* Override any absolute positioning on mobile */
