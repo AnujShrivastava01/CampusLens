@@ -29,10 +29,20 @@ export const LenisSmoothScrollProvider = ({ children }: LenisSmoothScrollProvide
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    // Check if device is mobile
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    
+    // Skip Lenis initialization on mobile devices for better touch scrolling
+    if (isMobile) {
+      console.log('Mobile device detected - using native scroll');
+      setIsReady(true);
+      return;
+    }
+
     // Add a small delay to ensure DOM is fully loaded
     const initTimer = setTimeout(() => {
       try {
-        // Initialize Lenis with minimal settings
+        // Initialize Lenis with minimal settings for desktop only
         const lenis = new Lenis({
           duration: 1.2,
           easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -95,35 +105,55 @@ export const LenisSmoothScrollProvider = ({ children }: LenisSmoothScrollProvide
   }, []);
 
   const scrollTo = (target: string | number, options?: Record<string, unknown>) => {
-    if (lenisRef.current && isReady) {
-      try {
-        lenisRef.current.scrollTo(target, {
-          duration: 1.0,
-          easing: (t: number) => 1 - Math.pow(1 - t, 3),
-          immediate: false,
-          ...options,
-        });
-      } catch (error) {
-        console.warn('Lenis scrollTo error:', error);
-        // Fallback to native scroll
-        if (typeof target === 'string') {
-          const element = document.querySelector(target);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }
-        } else {
-          window.scrollTo({ top: target, behavior: 'smooth' });
+    // Always use native scroll on mobile or if Lenis is not available
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    
+    if (isMobile || !lenisRef.current || !isReady) {
+      // Use native smooth scroll as fallback
+      if (typeof target === 'string') {
+        const element = document.querySelector(target);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
+      } else {
+        window.scrollTo({ top: target, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    // Use Lenis for desktop
+    try {
+      lenisRef.current.scrollTo(target, {
+        duration: 1.0,
+        easing: (t: number) => 1 - Math.pow(1 - t, 3),
+        immediate: false,
+        ...options,
+      });
+    } catch (error) {
+      console.warn('Lenis scrollTo error:', error);
+      // Fallback to native scroll
+      if (typeof target === 'string') {
+        const element = document.querySelector(target);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        window.scrollTo({ top: target, behavior: 'smooth' });
       }
     }
   };
 
   const scrollToTop = () => {
-    scrollTo(0);
+    // Always use native scroll for mobile-friendly experience
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const scrollToSection = (sectionId: string) => {
-    scrollTo(`#${sectionId}`);
+    // Always use native scroll for mobile-friendly experience
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   return (

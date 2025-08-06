@@ -12,14 +12,34 @@ html.lenis {
   scroll-behavior: auto;
 }
 
-/* Lenis scroll optimization */
+/* Lenis scroll optimization - Mobile friendly */
 html.lenis,
 html.lenis body {
   height: auto;
 }
 
-html.lenis body {
-  overflow: hidden;
+/* Only apply overflow hidden on desktop, not mobile */
+@media (min-width: 768px) {
+  html.lenis body {
+    overflow: hidden;
+  }
+}
+
+/* Enhanced mobile scrolling support */
+@media (max-width: 767px) {
+  html.lenis body {
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    /* Enable momentum scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent overscroll bounce */
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Ensure touch events work properly */
+  html.lenis {
+    touch-action: pan-y;
+  }
 }
 
 /* Fallback for when Lenis is not active */
@@ -29,6 +49,10 @@ html:not(.lenis) {
 
 body {
   overflow-x: hidden;
+  /* Ensure touch scrolling works on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Enable momentum scrolling on iOS */
+  overscroll-behavior-y: contain;
 }
 
 /* Performance optimizations */
