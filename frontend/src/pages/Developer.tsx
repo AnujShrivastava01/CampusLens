@@ -25,95 +25,174 @@ const Developer = () => {
 
   return (
     <Layout>
-      <div className="min-h-screen relative overflow-hidden bg-white dark:bg-gradient-to-br dark:from-slate-900 dark:via-purple-900 dark:to-slate-900">
+      <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/20 dark:bg-gradient-to-br dark:from-gray-900 dark:via-slate-800 dark:to-gray-900">
         {/* Animated Background Effects */}
         <div className="absolute inset-0">
-          {/* Floating animated blobs */}
+          {/* Primary floating animated blobs - Enhanced for light mode */}
           <motion.div
-            className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-600/20 dark:from-blue-400/30 dark:to-purple-600/30 rounded-full blur-3xl"
+            className="absolute -top-20 -left-20 w-96 h-96 bg-gradient-to-r from-blue-400/30 via-cyan-300/25 to-purple-400/30 dark:from-blue-400/30 dark:to-purple-600/30 rounded-full blur-3xl"
             animate={{
-              x: [0, 100, -50, 0],
-              y: [0, -100, 50, 0],
-              scale: [1, 1.2, 0.8, 1],
+              x: [0, 120, -60, 0],
+              y: [0, -80, 40, 0],
+              scale: [1, 1.3, 0.9, 1],
+              rotate: [0, 90, 180, 270, 360],
             }}
             transition={{
-              duration: 20,
+              duration: 25,
               repeat: Infinity,
               ease: "easeInOut"
             }}
           />
           
           <motion.div
-            className="absolute top-1/3 right-0 w-80 h-80 bg-gradient-to-r from-purple-500/15 to-pink-500/15 dark:from-purple-500/25 dark:to-pink-500/25 rounded-full blur-3xl"
+            className="absolute top-1/4 -right-32 w-80 h-80 bg-gradient-to-r from-purple-400/25 via-pink-300/20 to-rose-400/25 dark:from-purple-500/25 dark:to-pink-500/25 rounded-full blur-3xl"
             animate={{
-              x: [0, -80, 30, 0],
-              y: [0, 60, -40, 0],
-              scale: [1, 0.9, 1.1, 1],
+              x: [0, -100, 50, 0],
+              y: [0, 80, -60, 0],
+              scale: [1, 0.8, 1.2, 1],
+              rotate: [360, 270, 180, 90, 0],
+            }}
+            transition={{
+              duration: 20,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 3
+            }}
+          />
+          
+          <motion.div
+            className="absolute bottom-10 left-1/4 w-72 h-72 bg-gradient-to-r from-cyan-300/20 via-teal-300/15 to-blue-400/25 dark:from-cyan-400/20 dark:to-blue-500/20 rounded-full blur-2xl"
+            animate={{
+              x: [0, 90, -110, 0],
+              y: [0, -70, 60, 0],
+              scale: [1, 1.4, 0.6, 1],
+              rotate: [0, -90, -180, -270, -360],
+            }}
+            transition={{
+              duration: 28,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 6
+            }}
+          />
+          
+          <motion.div
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-indigo-300/15 via-violet-300/20 to-purple-300/15 dark:from-indigo-400/15 dark:to-purple-400/15 rounded-full blur-2xl"
+            animate={{
+              x: [0, -140, 80, 0],
+              y: [0, 100, -90, 0],
+              scale: [1, 0.7, 1.3, 1],
+              rotate: [0, 45, 90, 135, 180, 225, 270, 315, 360],
             }}
             transition={{
               duration: 18,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 2
+              delay: 1
             }}
           />
-          
+
+          {/* Additional light mode specific blobs */}
           <motion.div
-            className="absolute bottom-0 left-1/3 w-72 h-72 bg-gradient-to-r from-cyan-400/10 to-blue-500/10 dark:from-cyan-400/20 dark:to-blue-500/20 rounded-full blur-2xl"
+            className="absolute top-3/4 right-1/4 w-60 h-60 bg-gradient-to-r from-emerald-300/20 via-green-200/15 to-teal-300/20 dark:from-emerald-400/10 dark:to-teal-400/10 rounded-full blur-2xl"
             animate={{
-              x: [0, 70, -90, 0],
-              y: [0, -50, 80, 0],
-              scale: [1, 1.3, 0.7, 1],
+              x: [0, -70, 40, 0],
+              y: [0, -40, 70, 0],
+              scale: [1, 1.1, 0.9, 1],
+              rotate: [0, 120, 240, 360],
             }}
             transition={{
               duration: 22,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 8
+            }}
+          />
+
+          <motion.div
+            className="absolute top-10 right-10 w-48 h-48 bg-gradient-to-r from-orange-200/25 via-yellow-200/20 to-amber-300/25 dark:from-orange-400/10 dark:to-amber-400/10 rounded-full blur-2xl"
+            animate={{
+              x: [0, -30, 60, 0],
+              y: [0, 50, -25, 0],
+              scale: [1, 0.85, 1.15, 1],
+              rotate: [360, 240, 120, 0],
+            }}
+            transition={{
+              duration: 15,
               repeat: Infinity,
               ease: "easeInOut",
               delay: 4
             }}
           />
           
-          <motion.div
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-r from-indigo-400/8 to-purple-400/8 dark:from-indigo-400/15 dark:to-purple-400/15 rounded-full blur-2xl"
-            animate={{
-              x: [0, -120, 60, 0],
-              y: [0, 90, -70, 0],
-              scale: [1, 0.8, 1.2, 1],
-            }}
-            transition={{
-              duration: 16,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-          
-          {/* Animated particles */}
-          <div className="absolute inset-0 opacity-30 dark:opacity-40">
-            {Array.from({ length: 50 }).map((_, i) => (
+          {/* Enhanced animated particles with more variety for light mode */}
+          <div className="absolute inset-0 opacity-40 dark:opacity-40">
+            {Array.from({ length: 60 }).map((_, i) => (
               <motion.div
                 key={i}
-                className="absolute w-1 h-1 bg-slate-400/30 dark:bg-white/20 rounded-full"
+                className={`absolute rounded-full ${
+                  i % 4 === 0 
+                    ? 'w-1.5 h-1.5 bg-blue-400/40 dark:bg-blue-300/30'
+                    : i % 4 === 1 
+                    ? 'w-1 h-1 bg-purple-400/50 dark:bg-purple-300/25'
+                    : i % 4 === 2
+                    ? 'w-2 h-2 bg-cyan-400/30 dark:bg-cyan-300/20'
+                    : 'w-0.5 h-0.5 bg-pink-400/60 dark:bg-pink-300/35'
+                }`}
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
                 }}
                 animate={{
-                  y: [0, -30, 0],
-                  opacity: [0, 1, 0],
+                  y: [0, -40, 0],
+                  x: [0, Math.random() > 0.5 ? 20 : -20, 0],
+                  opacity: [0, 0.8, 0],
+                  scale: [0.5, 1.2, 0.5],
                 }}
                 transition={{
-                  duration: Math.random() * 3 + 2,
+                  duration: Math.random() * 4 + 3,
                   repeat: Infinity,
-                  delay: Math.random() * 5,
+                  delay: Math.random() * 8,
+                  ease: "easeInOut"
                 }}
               />
             ))}
           </div>
+
+          {/* Interactive mouse-follow blur effect */}
+          <motion.div
+            className="absolute w-32 h-32 bg-gradient-to-r from-blue-300/20 via-purple-300/15 to-pink-300/20 dark:from-blue-400/15 dark:via-purple-400/10 dark:to-pink-400/15 rounded-full blur-xl pointer-events-none"
+            animate={{
+              scale: [1, 1.5, 1],
+              rotate: [0, 360],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            style={{
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          />
           
-          {/* Gradient mesh overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/3 to-transparent dark:via-purple-500/5 blur-sm" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/3 to-transparent dark:via-blue-500/5 blur-sm" />
+          {/* Enhanced gradient mesh overlays for more depth in light mode */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-300/8 to-transparent dark:via-purple-500/5 blur-sm" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-300/8 to-transparent dark:via-blue-500/5 blur-sm" />
+          <div className="absolute inset-0 bg-gradient-to-tr from-cyan-200/5 via-transparent to-pink-200/5 dark:from-cyan-400/3 dark:to-pink-400/3 blur-lg" />
+          
+          {/* Subtle animated grid pattern for light mode */}
+          <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
+            <div 
+              className="w-full h-full"
+              style={{
+                backgroundImage: `radial-gradient(circle at 1px 1px, rgb(148 163 184) 1px, transparent 0)`,
+                backgroundSize: '40px 40px',
+              }}
+            />
+          </div>
         </div>
 
         <div className="container mx-auto px-4 md:px-6 py-10 md:py-20 relative z-10">
