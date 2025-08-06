@@ -138,14 +138,6 @@ const HeroSection = () => {
           }}
         ></div>
         <div 
-          className="absolute -bottom-32 -right-32 w-64 h-64 bg-gradient-to-r from-purple-400/10 to-pink-500/10 rounded-full blur-3xl"
-          style={{
-            opacity: isVisible ? 1 : 0,
-            transform: isVisible ? 'translate(0, 0) scale(1)' : 'translate(20px, 20px) scale(0.8)',
-            transition: 'all 3s cubic-bezier(0.16, 1, 0.3, 1) 1.7s',
-          }}
-        ></div>
-        <div 
           className="absolute top-1/2 -left-40 w-48 h-48 bg-gradient-to-r from-cyan-400/10 to-blue-500/10 rounded-full blur-3xl"
           style={{
             opacity: isVisible ? 1 : 0,

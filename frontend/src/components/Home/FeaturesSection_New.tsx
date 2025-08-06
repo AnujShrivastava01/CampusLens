@@ -498,43 +498,43 @@ const FeaturesSection = () => {
       illustration: ExcelUploadIllustration,
       title: "Excel Integration and Upload",
       description: "Seamlessly upload .xlsx and .csv files with automatic parsing and data validation for instant student record management.",
-      bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      borderColor: "border-blue-100 dark:border-blue-800/30"
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-100"
     },
     {
       illustration: SecureAuthIllustration,
       title: "Secure Authentication System",
       description: "Advanced Google OAuth integration ensuring secure access control and protecting sensitive student information.",
-      bgColor: "bg-green-50 dark:bg-green-900/20",
-      borderColor: "border-green-100 dark:border-green-800/30"
+      bgColor: "bg-green-50",
+      borderColor: "border-green-100"
     },
     {
       illustration: RealTimeProcessingIllustration,
       title: "Real-time Data Processing",
       description: "Experience instant data processing with live dashboard updates and real-time synchronization across all platforms.",
-      bgColor: "bg-purple-50 dark:bg-purple-900/20",
-      borderColor: "border-purple-100 dark:border-purple-800/30"
+      bgColor: "bg-purple-50",
+      borderColor: "border-purple-100"
     },
     {
       illustration: DataFilteringIllustration,
       title: "Advanced Smart Filtering",
       description: "Powerful filtering capabilities by student name, mobile number, branch, enrollment date, and custom criteria.",
-      bgColor: "bg-orange-50 dark:bg-orange-900/20",
-      borderColor: "border-orange-100 dark:border-orange-800/30"
+      bgColor: "bg-orange-50",
+      borderColor: "border-orange-100"
     },
     {
       illustration: ExportDownloadIllustration,
       title: "Multi-format Export Options",
       description: "Download your filtered student data in multiple formats including Excel, CSV, PDF with customizable templates.",
-      bgColor: "bg-pink-50 dark:bg-pink-900/20",
-      borderColor: "border-pink-100 dark:border-pink-800/30"
+      bgColor: "bg-pink-50",
+      borderColor: "border-pink-100"
     },
     {
       illustration: DataManagementIllustration,
       title: "Comprehensive Data Management",
       description: "Efficiently manage student records with bulk operations, individual sheet management, and automated backup systems.",
-      bgColor: "bg-indigo-50 dark:bg-indigo-900/20",
-      borderColor: "border-indigo-100 dark:border-indigo-800/30"
+      bgColor: "bg-indigo-50",
+      borderColor: "border-indigo-100"
     }
   ];
 
@@ -565,7 +565,7 @@ const FeaturesSection = () => {
   };
 
   return (
-    <section id="features" className="py-20 px-4 bg-white dark:bg-gray-900 relative z-10 transition-colors duration-300">
+    <section id="features" className="py-20 px-4 bg-gradient-to-br from-slate-50 via-white to-blue-50">
       <div className="container mx-auto max-w-7xl">
         <motion.div
           className="text-center mb-16"
@@ -575,7 +575,7 @@ const FeaturesSection = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 text-gray-900 dark:text-white transition-colors duration-300"
+            className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -587,7 +587,7 @@ const FeaturesSection = () => {
             </span>
           </motion.h2>
           <motion.p 
-            className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed transition-colors duration-300"
+            className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -617,7 +617,7 @@ const FeaturesSection = () => {
             >
               <div className={`${feature.bgColor} ${feature.borderColor} border-2 rounded-2xl p-8 h-full transition-all duration-500 hover:shadow-xl hover:border-opacity-50 relative overflow-hidden`}>
                 {/* Background decoration */}
-                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/50 to-transparent dark:from-white/10 dark:to-transparent rounded-bl-3xl opacity-70"></div>
+                <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-white/50 to-transparent rounded-bl-3xl opacity-70"></div>
                 
                 {/* Illustration */}
                 <motion.div 
@@ -631,7 +631,7 @@ const FeaturesSection = () => {
                 {/* Content */}
                 <div className="space-y-4">
                   <motion.h3 
-                    className="text-xl font-bold text-gray-900 dark:text-white leading-tight transition-colors duration-300"
+                    className="text-xl font-bold text-gray-900 leading-tight"
                     whileHover={{ scale: 1.02 }}
                     transition={{ duration: 0.2 }}
                   >
@@ -639,7 +639,7 @@ const FeaturesSection = () => {
                   </motion.h3>
                   
                   <motion.p 
-                    className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed transition-colors duration-300"
+                    className="text-gray-600 text-sm leading-relaxed"
                     initial={{ opacity: 0.8 }}
                     whileHover={{ opacity: 1 }}
                     transition={{ duration: 0.3 }}
@@ -650,7 +650,7 @@ const FeaturesSection = () => {
 
                 {/* Hover effect overlay */}
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 dark:from-blue-400/10 dark:to-purple-400/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 />
               </div>
             </motion.div>

@@ -172,8 +172,13 @@ body {
 
   body {
     @apply bg-background text-foreground;
-    background: var(--gradient-hero);
+    background: white;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .dark body {
+    background: #0f172a;
   }
 }
 
@@ -403,6 +408,43 @@ body {
     transform: scale(0.98);
     transition: transform 0.1s ease;
   }
+}
+
+/* Enhanced Features Section Animations */
+.glass-card {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: translateY(-8px);
+}
+
+/* Animated icon glow effect */
+.animated-icon-glow {
+  position: relative;
+}
+
+.animated-icon-glow::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: inherit;
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.animated-icon-glow:hover::before {
+  opacity: 0.6;
 }
 
 /* Toast and Notification z-index fixes */
