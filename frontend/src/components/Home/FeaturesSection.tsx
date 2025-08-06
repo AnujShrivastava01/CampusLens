@@ -524,8 +524,8 @@ const FeaturesSection = () => {
     },
     {
       illustration: ExportDownloadIllustration,
-      title: "Multi-format Export Options",
-      description: "Download your filtered student data in multiple formats including Excel, CSV, PDF with customizable templates.",
+      title: "Excel Export Option",
+      description: "Download your filtered student data in Excel format with customizable templates for easy data management.",
       bgColor: "bg-pink-50 dark:bg-pink-900/20",
       borderColor: "border-pink-100 dark:border-pink-800/30"
     },
