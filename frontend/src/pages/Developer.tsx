@@ -3,8 +3,25 @@ import { Github, Linkedin, ExternalLink, Heart, Sparkles, Code, Brain } from "lu
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout/Layout";
+import { useState, useEffect } from "react";
 
 const Developer = () => {
+  const [isImageRevealed, setIsImageRevealed] = useState(false);
+
+  const handleImageClick = () => {
+    setIsImageRevealed(!isImageRevealed);
+  };
+
+  // Auto-hide image after 5 seconds on mobile for better UX
+  useEffect(() => {
+    if (isImageRevealed && window.innerWidth < 768) {
+      const timer = setTimeout(() => {
+        setIsImageRevealed(false);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isImageRevealed]);
   return (
     <Layout>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/50 to-indigo-100/30 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 relative overflow-hidden">
@@ -116,29 +133,72 @@ const Developer = () => {
                     {/* Avatar Section */}
                     <div className="relative flex-shrink-0">
                       <motion.div
-                        className="w-48 h-32 md:w-64 md:h-40 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 p-1"
+                        className="w-48 h-32 md:w-64 md:h-40 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 p-1 cursor-pointer mobile-image-reveal"
                         whileHover={{ 
-                          scale: 1.1,
+                          scale: 1.05,
                           boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3)"
                         }}
+                        whileTap={{ scale: 0.98 }}
                         transition={{ duration: 0.3 }}
+                        onClick={handleImageClick}
                       >
                         <div className="w-full h-full rounded-lg bg-white dark:bg-slate-800 flex items-center justify-center relative overflow-hidden">
                           <motion.img
                             src="/icon.jpg"
                             alt="Anuj Shrivastava"
-                            className="w-full h-full rounded-lg object-cover filter blur-sm"
-                            whileHover={{ filter: "blur(0px)" }}
-                            whileTap={{ filter: "blur(0px)" }}
-                            transition={{ duration: 0.3 }}
+                            className="w-full h-full rounded-lg object-cover"
+                            style={{ filter: isImageRevealed ? "blur(0px)" : "blur(8px)" }}
+                            animate={{ 
+                              filter: isImageRevealed ? "blur(0px)" : "blur(8px)"
+                            }}
+                            transition={{ 
+                              duration: 0.6, 
+                              ease: [0.4, 0, 0.2, 1] // Smooth cubic-bezier
+                            }}
                           />
-                          {/* Sparkle Effect on Hover */}
-                          <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-500/20 rounded-lg"
-                            initial={{ opacity: 0, scale: 0 }}
-                            whileHover={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.3 }}
-                          />
+                          
+                          {/* Click indicator overlay when blurred */}
+                          {!isImageRevealed && (
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-lg"
+                              initial={{ opacity: 0.8 }}
+                              animate={{ 
+                                opacity: [0.6, 1, 0.6],
+                                scale: [1, 1.02, 1]
+                              }}
+                              transition={{ 
+                                duration: 2, 
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                            />
+                          )}
+                          
+                          {/* Sparkle Effect when revealed */}
+                          {isImageRevealed && (
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-purple-500/20 rounded-lg"
+                              initial={{ opacity: 0, scale: 0.8 }}
+                              animate={{ opacity: [0, 1, 0], scale: [0.8, 1.1, 1] }}
+                              transition={{ 
+                                duration: 1.2,
+                                ease: "easeOut"
+                              }}
+                            />
+                          )}
+                          
+                          {/* Shimmer effect on reveal */}
+                          {isImageRevealed && (
+                            <motion.div
+                              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent rounded-lg"
+                              initial={{ x: "-100%" }}
+                              animate={{ x: "200%" }}
+                              transition={{ 
+                                duration: 0.8,
+                                ease: "easeInOut"
+                              }}
+                            />
+                          )}
                         </div>
                       </motion.div>
                       <motion.div
