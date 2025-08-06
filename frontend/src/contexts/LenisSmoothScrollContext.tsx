@@ -29,13 +29,18 @@ export const LenisSmoothScrollProvider = ({ children }: LenisSmoothScrollProvide
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    // Check if device is mobile
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    // Check if device is mobile - more comprehensive detection
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                     window.innerWidth < 768 || 
+                     ('ontouchstart' in window) || 
+                     (navigator.maxTouchPoints > 0);
     
-    // Skip Lenis initialization on mobile devices for better touch scrolling
+    // Skip Lenis initialization on mobile devices for better touch scrolling and pull-to-refresh
     if (isMobile) {
-      console.log('Mobile device detected - using native scroll');
+      console.log('Mobile device detected - using native scroll with pull-to-refresh support');
       setIsReady(true);
+      // Ensure no lenis class is added on mobile
+      document.documentElement.classList.remove('lenis');
       return;
     }
 
@@ -105,8 +110,11 @@ export const LenisSmoothScrollProvider = ({ children }: LenisSmoothScrollProvide
   }, []);
 
   const scrollTo = (target: string | number, options?: Record<string, unknown>) => {
-    // Always use native scroll on mobile or if Lenis is not available
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    // Comprehensive mobile detection - always use native scroll on mobile for best experience
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                     window.innerWidth < 768 || 
+                     ('ontouchstart' in window) || 
+                     (navigator.maxTouchPoints > 0);
     
     if (isMobile || !lenisRef.current || !isReady) {
       // Use native smooth scroll as fallback

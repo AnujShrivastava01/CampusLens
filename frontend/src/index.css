@@ -5,11 +5,32 @@
 /* Enhanced smooth scrolling with Lenis integration */
 html {
   scroll-behavior: smooth;
+  /* Ensure pull-to-refresh works on all devices */
+  overscroll-behavior-y: auto;
 }
 
-/* Override for Lenis when active */
+/* Override for Lenis when active on desktop only */
 html.lenis {
   scroll-behavior: auto;
+}
+
+@media (min-width: 768px) {
+  html.lenis {
+    scroll-behavior: auto;
+  }
+}
+
+/* Ensure mobile devices always have native behavior */
+@media (max-width: 767px) {
+  html {
+    scroll-behavior: smooth;
+    overscroll-behavior-y: auto !important;
+  }
+  
+  html.lenis {
+    scroll-behavior: smooth !important;
+    overscroll-behavior-y: auto !important;
+  }
 }
 
 /* Lenis scroll optimization - Mobile friendly */
@@ -32,13 +53,26 @@ html.lenis body {
     overflow-x: hidden;
     /* Enable momentum scrolling on iOS */
     -webkit-overflow-scrolling: touch;
-    /* Prevent overscroll bounce */
-    overscroll-behavior-y: contain;
+    /* Allow pull-to-refresh on mobile */
+    overscroll-behavior-y: auto;
   }
   
-  /* Ensure touch events work properly */
+  /* Ensure touch events work properly and allow pull-to-refresh */
   html.lenis {
     touch-action: pan-y;
+    overscroll-behavior-y: auto;
+  }
+}
+
+/* Also ensure non-Lenis mobile devices support pull-to-refresh */
+@media (max-width: 767px) {
+  html:not(.lenis) {
+    overscroll-behavior-y: auto;
+  }
+  
+  html:not(.lenis) body {
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
@@ -51,8 +85,8 @@ body {
   overflow-x: hidden;
   /* Ensure touch scrolling works on iOS */
   -webkit-overflow-scrolling: touch;
-  /* Enable momentum scrolling on iOS */
-  overscroll-behavior-y: contain;
+  /* Allow pull-to-refresh behavior on mobile */
+  overscroll-behavior-y: auto;
 }
 
 /* Performance optimizations */
