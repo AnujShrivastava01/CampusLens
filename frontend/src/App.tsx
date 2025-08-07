@@ -18,7 +18,7 @@ import FileView from "./pages/FileView";
 import Developer from "./pages/Developer";
 import NotFound from "./pages/NotFound";
 import "@/styles/transitions.css";
-import { useState } from "react";
+import React, { useState } from "react";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +35,18 @@ const App = () => {
   const handlePreloaderComplete = () => {
     setIsLoading(false);
   };
+
+  // Add mobile-friendly classes to body on mount
+  React.useEffect(() => {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    if (isMobile) {
+      document.body.classList.add('mobile-scroll-container', 'allow-overscroll');
+    }
+    
+    return () => {
+      document.body.classList.remove('mobile-scroll-container', 'allow-overscroll');
+    };
+  }, []);
 
   if (isLoading) {
     return <Preloader onComplete={handlePreloaderComplete} />;

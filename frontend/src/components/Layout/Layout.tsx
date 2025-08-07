@@ -7,7 +7,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col mobile-scroll-container allow-overscroll">
       <main className="flex-1 pt-20">
         {children}
       </main>

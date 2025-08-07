@@ -197,8 +197,16 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     transition: background-color 0.3s ease, color 0.3s ease;
-    /* Ensure Lenis can handle scrolling */
-    overscroll-behavior: none;
+    /* Allow overscroll on mobile for pull-to-refresh, prevent on desktop */
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: auto;
+  }
+  
+  /* Desktop-specific overscroll behavior */
+  @media (min-width: 769px) {
+    body {
+      overscroll-behavior: none;
+    }
   }
   
   .dark body {
@@ -643,4 +651,45 @@ body {
 .mobile-menu-item:hover {
   transform: translateX(4px);
   background: var(--accent);
+}
+
+/* Mobile Pull-to-Refresh Support */
+@media (max-width: 768px) {
+  /* Enable pull-to-refresh on mobile devices */
+  html, body {
+    overscroll-behavior-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent Lenis from interfering with native pull-to-refresh */
+  .lenis.lenis-smooth {
+    overscroll-behavior-y: auto !important;
+  }
+  
+  /* Allow native scrolling momentum on iOS */
+  body {
+    -webkit-overflow-scrolling: touch;
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+  
+  /* Ensure touch events work properly */
+  * {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  
+  /* Specific elements that should not interfere with pull-to-refresh */
+  .mobile-scroll-container {
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Allow pull-to-refresh when at the top of the page */
+  .allow-overscroll {
+    overscroll-behavior-y: auto;
+  }
 }
