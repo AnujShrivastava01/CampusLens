@@ -227,10 +227,48 @@ const connectDB = async () => {
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 5000; // 5 seconds
 
+// Function to sync admin credentials from .env
+const syncAdminCredentials = async () => {
+  try {
+    const username = process.env.ADMIN_USERNAME;
+    const password = process.env.ADMIN_PASSWORD;
+
+    if (!username || !password) {
+      console.log('⚠️ ADMIN_USERNAME or ADMIN_PASSWORD not set in .env, skipping admin sync.');
+      return;
+    }
+
+    const Admin = (await import('./models/Admin.js')).default;
+    const admin = await Admin.findOne({ username });
+
+    if (!admin) {
+      console.log(`👤 Creating admin user '${username}' from .env...`);
+      await Admin.create({ username, password });
+      console.log('✅ Admin user created successfully.');
+    } else {
+      const isMatch = await admin.matchPassword(password);
+      if (!isMatch) {
+        console.log(`🔄 Updating password for admin '${username}' to match .env...`);
+        admin.password = password;
+        await admin.save();
+        console.log('✅ Admin password updated successfully.');
+      } else {
+        console.log('✅ Admin credentials are in sync with .env');
+      }
+    }
+  } catch (error) {
+    console.error('❌ Failed to sync admin credentials:', error.message);
+  }
+};
+
 async function connectWithRetry(retries = MAX_RETRIES) {
   try {
     await connectDB();
     console.log('✅ Database connection established successfully!');
+
+    // Sync admin credentials after successful connection
+    await syncAdminCredentials();
+
     return true;
   } catch (error) {
     if (retries > 0) {
