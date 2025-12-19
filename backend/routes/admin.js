@@ -20,7 +20,13 @@ const protect = async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
             const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_keep_it_safe');
 
-            req.admin = await Admin.findById(decoded.id).select('-password');
+            const admin = await Admin.findById(decoded.id).select('-password');
+
+            if (!admin || (decoded.tokenVersion !== undefined && decoded.tokenVersion !== admin.tokenVersion)) {
+                throw new Error('Not authorized, token invalid');
+            }
+
+            req.admin = admin;
             next();
         } catch (error) {
             console.error(error);
@@ -46,7 +52,7 @@ router.post('/login', async (req, res) => {
             res.json({
                 _id: admin._id,
                 username: admin.username,
-                token: jwt.sign({ id: admin._id }, process.env.JWT_SECRET || 'fallback_secret_keep_it_safe', {
+                token: jwt.sign({ id: admin._id, tokenVersion: admin.tokenVersion }, process.env.JWT_SECRET || 'fallback_secret_keep_it_safe', {
                     expiresIn: '30d',
                 }),
             });

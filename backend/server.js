@@ -237,7 +237,6 @@ const syncAdminCredentials = async () => {
       console.log('⚠️ ADMIN_USERNAME or ADMIN_PASSWORD not set in .env, skipping admin sync.');
       return;
     }
-
     const Admin = (await import('./models/Admin.js')).default;
     const admin = await Admin.findOne({ username });
 
@@ -250,8 +249,9 @@ const syncAdminCredentials = async () => {
       if (!isMatch) {
         console.log(`🔄 Updating password for admin '${username}' to match .env...`);
         admin.password = password;
+        admin.tokenVersion = (admin.tokenVersion || 0) + 1; // Invalidate all previous tokens
         await admin.save();
-        console.log('✅ Admin password updated successfully.');
+        console.log('✅ Admin password updated successfully (Sessions invalidated).');
       } else {
         console.log('✅ Admin credentials are in sync with .env');
       }
@@ -261,84 +261,6 @@ const syncAdminCredentials = async () => {
   }
 };
 
-async function connectWithRetry(retries = MAX_RETRIES) {
-  try {
-    await connectDB();
-    console.log('✅ Database connection established successfully!');
-
-    // Sync admin credentials after successful connection
-    await syncAdminCredentials();
-
-    return true;
-  } catch (error) {
-    if (retries > 0) {
-      console.log(`\n⚠️  Connection attempt failed. Retrying in ${RETRY_DELAY_MS / 1000} seconds... (${retries} attempts remaining)`);
-      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-      return connectWithRetry(retries - 1);
-    }
-
-    console.error('\n❌ All connection attempts failed. Please check your MongoDB connection and try again.');
-    console.error('Exiting process...');
-    process.exit(1);
-  }
-}
-
-// Start the connection process
-connectWithRetry().catch(error => {
-  console.error('Fatal error during database connection:', error);
-  process.exit(1);
-});
-
-// Health check endpoint
-app.get('/health', async (req, res) => {
-  try {
-    const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
-    const memoryUsage = process.memoryUsage();
-    const uptime = process.uptime();
-
-    // Try to ping the database
-    let dbPing = 'unavailable';
-    try {
-      await mongoose.connection.db.admin().ping();
-      dbPing = 'ok';
-    } catch (err) {
-      dbPing = `error: ${err.message}`;
-    }
-
-    res.status(200).json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      uptime: `${Math.floor(uptime / 60)}m ${Math.floor(uptime % 60)}s`,
-      database: {
-        status: dbStatus,
-        ping: dbPing,
-        host: mongoose.connection.host,
-        name: mongoose.connection.name,
-        version: (await mongoose.connection.db.admin().serverInfo()).version,
-      },
-      memory: {
-        rss: `${(memoryUsage.rss / 1024 / 1024).toFixed(2)} MB`,
-        heapTotal: `${(memoryUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
-        heapUsed: `${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
-        external: memoryUsage.external ? `${(memoryUsage.external / 1024 / 1024).toFixed(2)} MB` : 'N/A',
-      },
-      node: {
-        version: process.version,
-        platform: process.platform,
-        arch: process.arch,
-      },
-      environment: process.env.NODE_ENV || 'development',
-    });
-  } catch (error) {
-    console.error('Health check failed:', error);
-    res.status(500).json({
-      status: 'error',
-      message: 'Health check failed',
-      error: error.message,
-      timestamp: new Date().toISOString(),
-    });
-  }
-});
 
 // Temporary: Bypass authentication for development testing
 // TODO: Fix Clerk secret key and re-enable proper authentication
@@ -582,8 +504,17 @@ app.get('/api/debug/user/:userId', async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 CampusLens API Server running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🌐 Client URL: ${process.env.CLIENT_URL}`);
+// Connect to MongoDB and start server
+connectDB().then(async () => {
+  // Sync admin credentials
+  await syncAdminCredentials();
+
+  app.listen(PORT, () => {
+    console.log(`🚀 CampusLens API Server running on port ${PORT}`);
+    console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+    console.log(`🌐 Client URL: ${process.env.CLIENT_URL}`);
+  });
+}).catch((err) => {
+  console.error('❌ Failed to connect to MongoDB:', err);
+  process.exit(1);
 });
