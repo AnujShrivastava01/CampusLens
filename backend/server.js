@@ -9,6 +9,7 @@ import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 // Import routes
 import studentRoutes from './routes/students.js';
 import uploadRoutes from './routes/upload.js';
+import adminRoutes from './routes/admin.js';
 import { requireAuth, getAuthUser } from './middleware/auth.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
@@ -46,10 +47,10 @@ const corsOptions = {
       'http://127.0.0.1:8080', // Add support for port 8080
       'http://127.0.0.1:8081' // Add support for port 8081
     ];
-    
-    if (!origin || allowedOrigins.some(allowedOrigin => 
-      origin.startsWith(allowedOrigin) || 
-      origin.includes('localhost') || 
+
+    if (!origin || allowedOrigins.some(allowedOrigin =>
+      origin.startsWith(allowedOrigin) ||
+      origin.includes('localhost') ||
       origin.includes('127.0.0.1')
     )) {
       callback(null, true);
@@ -80,7 +81,7 @@ const authMiddleware = (req, res, next) => {
     // Skip auth middleware for upload route - it will handle auth internally
     return next();
   }
-  
+
   // Apply Clerk authentication for other routes
   return ClerkExpressRequireAuth()(req, res, next);
 };
@@ -88,6 +89,7 @@ const authMiddleware = (req, res, next) => {
 // Routes with authentication
 app.use('/api/students', authMiddleware, studentRoutes);
 app.use('/api/upload', uploadRoutes); // Upload routes handle auth internally
+app.use('/api/admin', adminRoutes);
 
 // Add root route to fix "Route not found" error
 app.get('/', (req, res) => {
@@ -108,7 +110,7 @@ app.get('/', (req, res) => {
 function maskMongoDBUri(uri) {
   if (!uri) return 'undefined';
   // Mask password in the connection string
-  return uri.replace(/mongodb(\+srv)?:\/\/([^:]+):([^@]+)@/, (match, srv, user) => 
+  return uri.replace(/mongodb(\+srv)?:\/\/([^:]+):([^@]+)@/, (match, srv, user) =>
     `mongodb${srv || ''}://${user}:***@`
   );
 }
@@ -117,28 +119,28 @@ function maskMongoDBUri(uri) {
 const connectDB = async () => {
   try {
     console.log('🔵 Attempting to connect to MongoDB...');
-    
+
     if (!process.env.MONGODB_URI) {
       throw new Error('MongoDB connection string is not defined in environment variables');
     }
-    
+
     // Log masked connection string for security
     console.log('🔗 MongoDB URI:', maskMongoDBUri(process.env.MONGODB_URI));
-    
+
     // Set mongoose debug mode in development
     if (process.env.NODE_ENV === 'development') {
       mongoose.set('debug', (collectionName, method, query, doc) => {
         console.log(`🔍 ${collectionName}.${method}`, JSON.stringify(query), doc || '');
       });
     }
-    
+
     // Add connection event listeners with timestamps
     const startTime = Date.now();
-    
+
     mongoose.connection.on('connecting', () => {
       console.log(`[${new Date().toISOString()}] 🔄 Connecting to MongoDB...`);
     });
-    
+
     mongoose.connection.on('connected', () => {
       const elapsed = Date.now() - startTime;
       console.log(`[${new Date().toISOString()}] ✅ MongoDB connected successfully! (${elapsed}ms)`);
@@ -149,7 +151,7 @@ const connectDB = async () => {
       console.log(`👤 User: ${conn.user || 'none'}`);
       console.log(`🔌 Connection state: ${conn.readyState === 1 ? 'Connected' : 'Disconnected'}`);
     });
-    
+
     mongoose.connection.on('error', (err) => {
       console.error(`[${new Date().toISOString()}] ❌ MongoDB connection error:`, err.message);
       console.error('Error details:', {
@@ -160,33 +162,33 @@ const connectDB = async () => {
         stack: err.stack
       });
     });
-    
+
     mongoose.connection.on('disconnected', () => {
       console.log(`[${new Date().toISOString()}] ℹ️  MongoDB disconnected`);
     });
-    
+
     // Connection options - simplified to match working test
     const options = {
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
       connectTimeoutMS: 10000
     };
-    
+
     console.log('🔌 Connection options:', {
       ...options,
       // Don't log sensitive info
       authSource: 'admin',
       ssl: process.env.MONGODB_URI.includes('ssl=true')
     });
-    
+
     console.log('⏳ Attempting to establish connection...');
-    
+
     const conn = await mongoose.connect(process.env.MONGODB_URI, options);
-    
+
     // Verify the connection by pinging the database
     await conn.connection.db.admin().ping();
     console.log('✅ Successfully connected and authenticated with MongoDB');
-    
+
     return conn;
   } catch (error) {
     const errorTime = new Date().toISOString();
@@ -198,7 +200,7 @@ const connectDB = async () => {
       message: error.message,
       stack: error.stack
     });
-    
+
     if (error.name === 'MongooseServerSelectionError') {
       console.error('\n🔍 This is a server selection error. Possible causes:');
       console.error('1. The MongoDB server is not running or not accessible');
@@ -207,7 +209,7 @@ const connectDB = async () => {
       console.error('4. Network connectivity issues or firewall blocking');
       console.error('5. Authentication failed (invalid credentials)');
       console.error('6. The MongoDB server is still starting up');
-      
+
       // Additional diagnostic information
       console.error('\n🔍 Diagnostic information:');
       console.error('- Connection string:', maskMongoDBUri(process.env.MONGODB_URI));
@@ -215,7 +217,7 @@ const connectDB = async () => {
       console.error('- Node.js version:', process.version);
       console.error('- Platform:', process.platform, process.arch);
     }
-    
+
     // Don't exit immediately, let the application handle the error
     throw error;
   }
@@ -236,7 +238,7 @@ async function connectWithRetry(retries = MAX_RETRIES) {
       await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
       return connectWithRetry(retries - 1);
     }
-    
+
     console.error('\n❌ All connection attempts failed. Please check your MongoDB connection and try again.');
     console.error('Exiting process...');
     process.exit(1);
@@ -255,7 +257,7 @@ app.get('/health', async (req, res) => {
     const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
     const memoryUsage = process.memoryUsage();
     const uptime = process.uptime();
-    
+
     // Try to ping the database
     let dbPing = 'unavailable';
     try {
@@ -264,7 +266,7 @@ app.get('/health', async (req, res) => {
     } catch (err) {
       dbPing = `error: ${err.message}`;
     }
-    
+
     res.status(200).json({
       status: 'ok',
       timestamp: new Date().toISOString(),
@@ -316,10 +318,10 @@ app.get('/api/debug/create-test-data/:fileId', async (req, res) => {
     const { fileId } = req.params;
     const FileUpload = (await import('./models/FileUpload.js')).default;
     const Student = (await import('./models/Student.js')).default;
-    
+
     // Clear existing students for this file
     await Student.deleteMany({ uploadId: fileId });
-    
+
     // Create test data
     const testStudents = [
       { 'Student Name': 'SHREECHA JHA', 'Contact No.': '6200710476', 'Branch': 'AIDS' },
@@ -328,7 +330,7 @@ app.get('/api/debug/create-test-data/:fileId', async (req, res) => {
       { 'Student Name': 'RAHUL KUMAR', 'Contact No.': '9876543210', 'Branch': 'CSE' },
       { 'Student Name': 'PRIYA SHARMA', 'Contact No.': '8765432109', 'Branch': 'IT' }
     ];
-    
+
     // Save test students
     for (let i = 0; i < testStudents.length; i++) {
       const student = new Student({
@@ -342,7 +344,7 @@ app.get('/api/debug/create-test-data/:fileId', async (req, res) => {
       });
       await student.save();
     }
-    
+
     // Update file stats
     const file = await FileUpload.findById(fileId);
     if (file) {
@@ -350,18 +352,18 @@ app.get('/api/debug/create-test-data/:fileId', async (req, res) => {
       file.failedRecords = Math.max(0, file.totalRecords - testStudents.length);
       await file.save();
     }
-    
-    res.json({ 
-      success: true, 
+
+    res.json({
+      success: true,
       message: `Created ${testStudents.length} test students for file ${fileId}`,
       students: testStudents.length
     });
   } catch (error) {
     console.error('Error creating test data:', error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       message: 'Failed to create test data',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -388,16 +390,16 @@ app.post('/api/public/upload-test', upload.single('file'), async (req, res) => {
     });
   } catch (error) {
     console.error('Upload test error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Upload test failed',
-      message: error.message 
+      message: error.message
     });
   }
 });
 
 // Add public test routes (temporary for debugging)
 app.get('/api/test', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'API is working',
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'
@@ -409,7 +411,7 @@ app.get('/api/public/stats', async (req, res) => {
   try {
     const totalStudents = await mongoose.connection.db.collection('students').countDocuments();
     const totalFiles = await mongoose.connection.db.collection('fileuploads').countDocuments();
-    
+
     res.json({
       totalStudents,
       totalFiles,
@@ -418,9 +420,9 @@ app.get('/api/public/stats', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching public stats:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch stats',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -442,9 +444,9 @@ app.get('/api/public/files', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching files:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch files',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -467,9 +469,9 @@ app.get('/api/public/students', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching students:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Failed to fetch students',
-      message: error.message 
+      message: error.message
     });
   }
 });
@@ -504,18 +506,18 @@ app.use('*', (req, res) => {
 app.get('/api/debug/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     // Get files for this user
     const files = await FileUpload.find({
       createdBy: userId,
       status: { $in: ['completed', 'completed_with_errors'] }
     }).limit(5);
-    
+
     // Get students for this user  
     const students = await Student.find({
       createdBy: userId
     }).limit(5);
-    
+
     res.json({
       success: true,
       debug: {

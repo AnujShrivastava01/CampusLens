@@ -16,6 +16,9 @@ import Students from "./pages/Students";
 import Files from "./pages/Files";
 import FileView from "./pages/FileView";
 import Developer from "./pages/Developer";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminFileView from "./pages/AdminFileView";
 import NotFound from "./pages/NotFound";
 import "@/styles/transitions.css";
 import React, { useState } from "react";
@@ -42,7 +45,7 @@ const App = () => {
     if (isMobile) {
       document.body.classList.add('mobile-scroll-container', 'allow-overscroll');
     }
-    
+
     return () => {
       document.body.classList.remove('mobile-scroll-container', 'allow-overscroll');
     };
@@ -69,6 +72,9 @@ const App = () => {
                   <Route path="/files" element={<PageTransition><Files /></PageTransition>} />
                   <Route path="/files/:fileId" element={<PageTransition><FileView /></PageTransition>} />
                   <Route path="/developer" element={<PageTransition><Developer /></PageTransition>} />
+                  <Route path="/admin/login" element={<PageTransition><AdminLogin /></PageTransition>} />
+                  <Route path="/admin/dashboard" element={<PageTransition><AdminDashboard /></PageTransition>} />
+                  <Route path="/admin/files/:fileId" element={<PageTransition><AdminFileView /></PageTransition>} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
                 </Routes>
