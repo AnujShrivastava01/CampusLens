@@ -103,7 +103,8 @@ const AdminFileView = () => {
             if (debouncedSearch) queryParams.append('search', debouncedSearch);
             if (Object.keys(filters).length > 0) queryParams.append('filters', JSON.stringify(filters));
 
-            const response = await fetch(`http://localhost:5000/api/admin/files/${fileId}/data?${queryParams.toString()}`, {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${API_URL}/admin/files/${fileId}/data?${queryParams.toString()}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -144,7 +145,8 @@ const AdminFileView = () => {
 
         try {
             setIsLoadingUniqueValues(true);
-            const response = await fetch(`http://localhost:5000/api/admin/files/${fileId}/unique-values`, {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${API_URL}/admin/files/${fileId}/unique-values`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

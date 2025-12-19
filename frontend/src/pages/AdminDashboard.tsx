@@ -34,7 +34,8 @@ const AdminDashboard = () => {
     const fetchFiles = async () => {
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await fetch('http://localhost:5000/api/admin/files', {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${API_URL}/admin/files`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -73,7 +74,8 @@ const AdminDashboard = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await fetch('http://localhost:5000/api/admin/upload', {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${API_URL}/admin/upload`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -103,7 +105,8 @@ const AdminDashboard = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            const response = await fetch(`http://localhost:5000/api/admin/files/${id}`, {
+            const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+            const response = await fetch(`${API_URL}/admin/files/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -189,8 +192,8 @@ const AdminDashboard = () => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className={`px-2 py-1 rounded-full text-xs whitespace-nowrap ${file.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                                            file.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                                                                'bg-red-100 text-red-800'
+                                                        file.status === 'processing' ? 'bg-blue-100 text-blue-800' :
+                                                            'bg-red-100 text-red-800'
                                                         }`}>
                                                         {file.status}
                                                     </span>
