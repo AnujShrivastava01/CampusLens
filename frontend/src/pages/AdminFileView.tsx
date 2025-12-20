@@ -235,7 +235,7 @@ const AdminFileView = () => {
     const { file, students, pagination } = fileData;
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 pt-24">
             <div className="container mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col items-center space-y-4">

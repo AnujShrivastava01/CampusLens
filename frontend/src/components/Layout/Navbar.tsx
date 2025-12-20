@@ -65,8 +65,14 @@ const Navbar = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
-            <NavLink to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
-            <NavLink to="/files" icon={FileSpreadsheet} label="Files" />
+            <NavLink
+              to={localStorage.getItem('adminToken') ? "/admin/dashboard" : "/dashboard"}
+              icon={LayoutDashboard}
+              label="Dashboard"
+            />
+            {!localStorage.getItem('adminToken') && (
+              <NavLink to="/files" icon={FileSpreadsheet} label="Files" />
+            )}
             <NavLink to="/developer" icon={User} label="Developer" />
           </div>
 
