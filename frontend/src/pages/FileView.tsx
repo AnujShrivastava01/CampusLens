@@ -17,7 +17,7 @@ import {
   AlertCircle,
   CheckCircle
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { apiService, Student } from "@/services/api";
 import { useToast } from "@/components/ui/use-toast";
 import { useParams, useNavigate } from "react-router-dom";
@@ -79,29 +79,26 @@ const FileView = () => {
   const [fileData, setFileData] = useState<FileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [uniqueValues, setUniqueValues] = useState<Record<string, any[]>>({});
-  const [isLoadingUniqueValues, setIsLoadingUniqueValues] = useState(false);
-  
+
   // Filter and search states
-  const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // Immediate input value
+  const [search, setSearch] = useState('');         // Debounced filtered value
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
 
-  // Debounce search input to avoid excessive API calls
+  // Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500); // 500ms delay
-
+      setSearch(searchTerm);
+    }, 300);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [searchTerm]);
 
   // Reset to first page when search or filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch, filters]);
+  }, [search, filters]);
 
   const fetchFileData = useCallback(async () => {
     if (!fileId) {
@@ -119,14 +116,13 @@ const FileView = () => {
     try {
       setIsLoading(true);
       setError(null);
-      
+
+      // Fetch all records at once for client-side filtering
       const response = await apiService.getFileData(fileId, {
-        page: currentPage,
-        limit: pageSize,
-        search: debouncedSearch || undefined,
-        filters: Object.keys(filters).length > 0 ? filters : undefined,
+        page: 1,
+        limit: 100000,
       });
-      
+
       setFileData(response.data);
     } catch (error) {
       console.error('Error fetching file data:', error);
@@ -140,7 +136,7 @@ const FileView = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [fileId, currentPage, pageSize, debouncedSearch, filters, isSignedIn, toast]);
+  }, [fileId, isSignedIn, toast]);
 
   useEffect(() => {
     if (isLoaded) {
@@ -148,133 +144,55 @@ const FileView = () => {
     }
   }, [fetchFileData, isLoaded]);
 
-  // Fetch unique values for filter dropdowns
-  const fetchUniqueValues = useCallback(async () => {
-    if (!fileId || !isSignedIn) {
-      return;
-    }
-
-    try {
-      setIsLoadingUniqueValues(true);
-      const response = await apiService.getFileUniqueValues(fileId);
-      
-      if (response && response.uniqueValues && Object.keys(response.uniqueValues).length > 0) {
-        setUniqueValues(response.uniqueValues);
-      } else {
-        useFallbackUniqueValues();
-      }
-    } catch (error) {
-      // Fallback: use local data from current page if API fails
-      useFallbackUniqueValues();
-      
-      toast({
-        variant: "destructive",
-        title: "Error loading filter options",
-        description: "Using fallback data from current page.",
-      });
-    } finally {
-      setIsLoadingUniqueValues(false);
-    }
-  }, [fileId, isSignedIn, toast]);
-
-  // Get filtered unique values based on current filters (dynamic filtering)
-  const getFilteredUniqueValues = useCallback((targetHeader: string) => {
-    if (!fileData?.students || Object.keys(uniqueValues).length === 0) {
-      return uniqueValues[targetHeader] || [];
-    }
-
-    // If no filters are applied, return all unique values
-    const activeFilters = Object.keys(filters).filter(key => filters[key] && key !== targetHeader);
-    if (activeFilters.length === 0) {
-      return uniqueValues[targetHeader] || [];
-    }
-
-    // Create filter object excluding the target header
-    const filtersForQuery = { ...filters };
-    delete filtersForQuery[targetHeader];
-
-    // For now, use local filtering until we can call the API efficiently
-    // In a production app, you might debounce API calls or cache results
-    const matchingRecords = fileData.students.filter(student => {
-      return activeFilters.every(filterKey => {
-        const filterValue = filters[filterKey];
-        const studentValue = student._rawData?.[filterKey] || student[filterKey as keyof Student];
-        return String(studentValue) === filterValue;
-      });
-    });
-
-    // Extract unique values for the target header from matching records
-    const filteredValues = new Set<string>();
-    matchingRecords.forEach(student => {
-      const value = student._rawData?.[targetHeader] || student[targetHeader as keyof Student];
-      if (value !== null && value !== undefined && value !== '') {
-        const stringValue = String(value).trim();
-        if (stringValue.length > 0) {
-          filteredValues.add(stringValue);
+  // Derive unique values for filter dropdowns from already-fetched data
+  const uniqueValues = useMemo<Record<string, string[]>>(() => {
+    if (!fileData?.students || !fileData.file?.headers) return {};
+    const result: Record<string, string[]> = {};
+    fileData.file.headers.forEach(header => {
+      const set = new Set<string>();
+      fileData.students.forEach(student => {
+        const val = student._rawData?.[header] ?? student[header as keyof Student];
+        if (val !== null && val !== undefined && val !== '') {
+          set.add(String(val).trim());
         }
-      }
+      });
+      result[header] = Array.from(set).sort();
     });
-
-    const result = Array.from(filteredValues);
     return result;
-  }, [fileData, uniqueValues, filters]);
+  }, [fileData]);
 
-  // Fallback function to generate unique values from current page data
-  const useFallbackUniqueValues = useCallback(() => {
-    if (fileData?.students && fileData.file?.headers) {
-      const fallbackUniqueValues: Record<string, any[]> = {};
-      
-      fileData.file.headers.forEach(header => {
-        const values = new Set<string>();
-        fileData.students.forEach(student => {
-          // Try multiple ways to get the value
-          let value = student._rawData?.[header] || student[header as keyof Student];
-          
-          // Also try common field mappings
-          if (!value && header.toLowerCase().includes('name')) {
-            value = student.firstName || student.lastName || student.fullName;
-          }
-          if (!value && header.toLowerCase().includes('department')) {
-            value = student.program;
-          }
-          
-          if (value !== null && value !== undefined && value !== '') {
-            const stringValue = String(value).trim();
-            if (stringValue.length > 0) {
-              values.add(stringValue);
-            }
-          }
-        });
-        fallbackUniqueValues[header] = Array.from(values).slice(0, 50); // Limit to 50 values
-      });
-      
-      setUniqueValues(fallbackUniqueValues);
-      
-      // Show success message
-      toast({
-        title: "Filter options loaded",
-        description: `Loaded filter options for ${Object.keys(fallbackUniqueValues).length} columns.`,
-      });
-    }
-  }, [fileData, toast]);
-
-  // Fetch unique values when component mounts or fileId changes
-  useEffect(() => {
-    if (isLoaded && fileId && isSignedIn) {
-      fetchUniqueValues();
-    }
-  }, [fetchUniqueValues, isLoaded, fileId, isSignedIn]);
-
-  // Also use fallback unique values when fileData is loaded and no unique values exist
-  useEffect(() => {
-    const hasFileData = !!fileData?.students?.length;
-    const hasNoUniqueValues = Object.keys(uniqueValues).length === 0;
-    const notCurrentlyLoading = !isLoadingUniqueValues;
+  // Pre-calculate dropdown options for all headers, considering other active filters
+  const filterOptions = useMemo<Record<string, string[]>>(() => {
+    if (!fileData?.students || !fileData.file?.headers) return uniqueValues;
+    const headers = fileData.file.headers;
+    const students = fileData.students;
     
-    if (hasFileData && hasNoUniqueValues && notCurrentlyLoading) {
-      setTimeout(() => useFallbackUniqueValues(), 500); // Small delay to ensure data is fully loaded
-    }
-  }, [fileData, uniqueValues, isLoadingUniqueValues, useFallbackUniqueValues]);
+    const result: Record<string, string[]> = {};
+    
+    headers.forEach(targetHeader => {
+      const otherFilters = Object.entries(filters).filter(([k, v]) => v && k !== targetHeader);
+      
+      if (otherFilters.length === 0) {
+        result[targetHeader] = uniqueValues[targetHeader] || [];
+        return;
+      }
+
+      const set = new Set<string>();
+      students.forEach(student => {
+        const matches = otherFilters.every(([k, v]) => {
+          const studentValue = String(student._rawData?.[k] ?? student[k as keyof Student] ?? '');
+          return studentValue === v;
+        });
+        if (matches) {
+          const val = student._rawData?.[targetHeader] ?? student[targetHeader as keyof Student];
+          if (val !== null && val !== undefined && val !== '') set.add(String(val).trim());
+        }
+      });
+      result[targetHeader] = Array.from(set).sort();
+    });
+    
+    return result;
+  }, [fileData?.students, fileData?.file?.headers, filters, uniqueValues]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -287,35 +205,63 @@ const FileView = () => {
     }
   };
 
+  // ── All hooks must be called before any early return ──────────────────────
+  const filteredStudents = useMemo(() => {
+    if (!fileData?.students) return [];
+    let result = [...fileData.students];
+    const file = fileData.file;
+
+    if (Object.keys(filters).length > 0) {
+      result = result.filter(student =>
+        Object.entries(filters).every(([key, value]) => {
+          const v = String(student._rawData?.[key] ?? student[key as keyof Student] ?? '');
+          return v === value;
+        })
+      );
+    }
+
+    if (search.trim() !== '') {
+      const term = search.trim().toLowerCase();
+      result = result.filter(student => {
+        if (String(student.studentId ?? '').toLowerCase().includes(term)) return true;
+        return (file?.headers ?? []).some(header => {
+          const v = String(student._rawData?.[header] ?? student[header as keyof Student] ?? '');
+          return v.toLowerCase().includes(term);
+        });
+      });
+    }
+
+    return result;
+  }, [fileData?.students, filters, search, fileData?.file?.headers]);
+
+  const clientPagination = useMemo(() => {
+    const total = filteredStudents.length;
+    const pages = Math.max(1, Math.ceil(total / pageSize));
+    const page = Math.min(Math.max(1, currentPage), pages);
+    return { total, pages, page, limit: pageSize };
+  }, [filteredStudents.length, pageSize, currentPage]);
+
+  const paginatedStudents = useMemo(() => {
+    const start = (clientPagination.page - 1) * pageSize;
+    return filteredStudents.slice(start, start + pageSize);
+  }, [filteredStudents, clientPagination.page, pageSize]);
+  // ─────────────────────────────────────────────────────────────────────────
+
   const handleFilterChange = (header: string, value: string | undefined) => {
     setFilters(prev => {
       const newFilters = { ...prev };
       if (value && value !== '' && value !== 'ALL') {
         newFilters[header] = value;
       } else {
-        delete newFilters[header]; // Remove the filter if value is empty/undefined/ALL
+        delete newFilters[header];
       }
-      
-      // Clear dependent filters that may no longer be valid
-      // For example, if Department changes, clear Name filter if the selected name
-      // is not available in the new department
-      const remainingHeaders = file?.headers || [];
-      remainingHeaders.forEach(otherHeader => {
-        if (otherHeader !== header && newFilters[otherHeader]) {
-          // Check if the current value for this filter is still valid
-          const filteredOptions = getFilteredUniqueValues(otherHeader);
-          if (!filteredOptions.includes(newFilters[otherHeader])) {
-            delete newFilters[otherHeader];
-          }
-        }
-      });
-      
       return newFilters;
     });
   };
 
   const clearFilters = () => {
     setFilters({});
+    setSearchTerm('');
     setSearch('');
     setCurrentPage(1);
   };
@@ -326,6 +272,7 @@ const FileView = () => {
     return String(value);
   };
 
+  // ── Early returns ──────────────────────────────────────────────────────────
   // Show loading state while Clerk is initializing
   if (!isLoaded) {
     return (
@@ -404,7 +351,7 @@ const FileView = () => {
     );
   }
 
-  const { file, students, pagination } = fileData;
+  const { file } = fileData;
 
   return (
     <Layout>
@@ -446,26 +393,24 @@ const FileView = () => {
               {/* Global Search */}
               <div className="md:col-span-2 lg:col-span-1">
                 <div className="relative">
-                  <Search className={`absolute left-3 top-3 h-4 w-4 ${debouncedSearch ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500'}`} />
+                  <Search className={`absolute left-3 top-3 h-4 w-4 ${searchTerm ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500'}`} />
                   <Input
                     placeholder="Search all fields..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className={`pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ${debouncedSearch ? 'border-blue-300 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''}`}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={`pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ${searchTerm ? 'border-blue-300 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''}`}
                   />
-                  {search !== debouncedSearch && (
-                    <div className="absolute right-8 top-3 h-4 w-4">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                    </div>
-                  )}
-                  {debouncedSearch && search === debouncedSearch && (
+                  {searchTerm && (
                     <div className="absolute right-8 top-3 h-4 w-4 text-green-500">
                       <CheckCircle className="h-4 w-4" />
                     </div>
                   )}
-                  {search && (
+                  {searchTerm && (
                     <button
-                      onClick={() => setSearch('')}
+                      onClick={() => {
+                        setSearchTerm('');
+                        setSearch('');
+                      }}
                       className="absolute right-3 top-3 h-4 w-4 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                       title="Clear search"
                     >
@@ -473,17 +418,17 @@ const FileView = () => {
                     </button>
                   )}
                 </div>
-                {debouncedSearch && (
+                {search && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Searching for: "{debouncedSearch}"
+                    Searching for: "{search}"
                   </p>
                 )}
               </div>
               
               {/* Column Filters */}
               {file?.headers && file.headers.length > 0 && file.headers.map(header => {
-                // Use dynamic filtering - get options that match current filters
-                const headerUniqueValues = getFilteredUniqueValues(header);
+                // Get options that match current filters (pre-calculated for performance)
+                const headerUniqueValues = filterOptions[header] || [];
                 const currentValue = filters[header] || "ALL";
                 
                 return (
@@ -497,11 +442,7 @@ const FileView = () => {
                       </SelectTrigger>
                       <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 max-h-[300px] select-dropdown-content">
                         <SelectItem value="ALL" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">All {header}</SelectItem>
-                        {isLoadingUniqueValues ? (
-                          <SelectItem value="LOADING" disabled className="text-gray-500 dark:text-gray-400">
-                            Loading options...
-                          </SelectItem>
-                        ) : headerUniqueValues.length === 0 ? (
+                        {headerUniqueValues.length === 0 ? (
                           <SelectItem value="NO_DATA" disabled className="text-gray-500 dark:text-gray-400">
                             No options available
                           </SelectItem>
@@ -542,18 +483,18 @@ const FileView = () => {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center space-x-2 text-gray-900 dark:text-gray-100">
-                  <span>Data ({pagination.total} records)</span>
-                  {(debouncedSearch || Object.keys(filters).length > 0) && (
+                  <span>Data ({clientPagination.total} records)</span>
+                  {(search || Object.keys(filters).length > 0) && (
                     <Badge variant="secondary" className="ml-2 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                       Filtered
                     </Badge>
                   )}
                 </CardTitle>
-                {(debouncedSearch || Object.keys(filters).length > 0) && (
+                {(search || Object.keys(filters).length > 0) && (
                   <div className="mt-1 space-y-1">
-                    {debouncedSearch && (
+                    {search && (
                       <p className="text-sm text-gray-600 dark:text-gray-400">
-                        🔍 Searching: "{debouncedSearch}"
+                        🔍 Searching: "{search}"
                       </p>
                     )}
                     {Object.keys(filters).length > 0 && (
@@ -600,38 +541,31 @@ const FileView = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {!students || students.length === 0 ? (
+                  {paginatedStudents.length === 0 ? (
                     <TableRow className="border-b border-gray-200 dark:border-gray-700">
                       <TableCell colSpan={file?.headers?.length || 0} className="text-center py-8 text-gray-900 dark:text-gray-100">
-                        {isLoading ? (
-                          <div className="flex items-center justify-center space-x-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
-                            <span>Loading data...</span>
-                          </div>
-                        ) : (
-                          <div className="space-y-2">
-                            <p>
-                              {debouncedSearch || Object.keys(filters).length > 0 
-                                ? 'No data found matching your search criteria' 
-                                : 'No data found'
-                              }
+                        <div className="space-y-2">
+                          <p>
+                            {search || Object.keys(filters).length > 0
+                              ? 'No data found matching your search criteria'
+                              : 'No data found'
+                            }
+                          </p>
+                          {search && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Searched for: "{search}"
                             </p>
-                            {debouncedSearch && (
-                              <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Searched for: "{debouncedSearch}"
-                              </p>
-                            )}
-                            {Object.keys(filters).length > 0 && (
-                              <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Active filters: {Object.entries(filters).map(([k, v]) => `${k}: ${v}`).join(', ')}
-                              </p>
-                            )}
-                          </div>
-                        )}
+                          )}
+                          {Object.keys(filters).length > 0 && (
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Active filters: {Object.entries(filters).map(([k, v]) => `${k}: ${v}`).join(', ')}
+                            </p>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ) : (
-                    students.map((student, index) => (
+                    paginatedStudents.map((student, index) => (
                       <TableRow key={student._id || index} className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                         {file?.headers && file.headers.map(header => (
                           <TableCell key={header} className="text-gray-900 dark:text-gray-100">
@@ -646,32 +580,32 @@ const FileView = () => {
             </div>
 
             {/* Pagination */}
-            {pagination.pages > 1 && (
+            {clientPagination.pages > 1 && (
               <div className="flex items-center justify-between mt-4">
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
-                  {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                  {pagination.total} results
+                  Showing {((clientPagination.page - 1) * pageSize) + 1} to{' '}
+                  {Math.min(clientPagination.page * pageSize, clientPagination.total)} of{' '}
+                  {clientPagination.total} results
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={clientPagination.page <= 1}
                     className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Previous
                   </Button>
                   <span className="text-sm text-gray-900 dark:text-gray-100">
-                    Page {pagination.page} of {pagination.pages}
+                    Page {clientPagination.page} of {clientPagination.pages}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={currentPage >= pagination.pages}
+                    onClick={() => setCurrentPage(p => Math.min(clientPagination.pages, p + 1))}
+                    disabled={clientPagination.page >= clientPagination.pages}
                     className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next

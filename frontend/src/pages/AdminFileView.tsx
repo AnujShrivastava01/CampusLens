@@ -15,7 +15,7 @@ import {
     AlertCircle,
     CheckCircle
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -58,8 +58,8 @@ const AdminFileView = () => {
     const [isLoadingUniqueValues, setIsLoadingUniqueValues] = useState(false);
 
     // Filter and search states
-    const [search, setSearch] = useState('');
-    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [searchTerm, setSearchTerm] = useState(''); // Immediate input value
+    const [search, setSearch] = useState('');         // Debounced filtered value
     const [filters, setFilters] = useState<Record<string, string>>({});
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(50);
@@ -67,16 +67,15 @@ const AdminFileView = () => {
     // Debounce search input
     useEffect(() => {
         const timer = setTimeout(() => {
-            setDebouncedSearch(search);
-        }, 500);
-
+            setSearch(searchTerm);
+        }, 300);
         return () => clearTimeout(timer);
-    }, [search]);
+    }, [searchTerm]);
 
     // Reset to first page when search or filters change
     useEffect(() => {
         setCurrentPage(1);
-    }, [debouncedSearch, filters]);
+    }, [search, filters]);
 
     const fetchFileData = useCallback(async () => {
         if (!fileId) {
@@ -96,12 +95,9 @@ const AdminFileView = () => {
             setError(null);
 
             const queryParams = new URLSearchParams({
-                page: currentPage.toString(),
-                limit: pageSize.toString(),
+                page: '1',
+                limit: '100000', // Fetch max records for client side filtering
             });
-
-            if (debouncedSearch) queryParams.append('search', debouncedSearch);
-            if (Object.keys(filters).length > 0) queryParams.append('filters', JSON.stringify(filters));
 
             const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
             const response = await fetch(`${API_URL}/admin/files/${fileId}/data?${queryParams.toString()}`, {
@@ -130,7 +126,7 @@ const AdminFileView = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [fileId, currentPage, pageSize, debouncedSearch, filters, navigate, toast]);
+    }, [fileId, navigate, toast]);
 
     useEffect(() => {
         fetchFileData();
@@ -201,6 +197,7 @@ const AdminFileView = () => {
 
     const clearFilters = () => {
         setFilters({});
+        setSearchTerm('');
         setSearch('');
         setCurrentPage(1);
     };
@@ -210,6 +207,45 @@ const AdminFileView = () => {
         if (typeof value === 'object') return JSON.stringify(value);
         return String(value);
     };
+
+    // ── All hooks must be called before any early return ──────────────────────
+    const fileHeaders = fileData?.file?.headers ?? [];
+
+    const { filteredStudents, clientPagination } = useMemo(() => {
+        const students = fileData?.students ?? [];
+        let filtered = [...students];
+
+        if (Object.keys(filters).length > 0) {
+            filtered = filtered.filter(student =>
+                Object.entries(filters).every(([key, value]) => {
+                    const v = String(student._rawData?.[key] ?? student[key as keyof Student] ?? '');
+                    return v === value;
+                })
+            );
+        }
+
+        if (search.trim() !== '') {
+            const term = search.trim().toLowerCase();
+            filtered = filtered.filter(student => {
+                if (String(student.studentId ?? '').toLowerCase().includes(term)) return true;
+                return fileHeaders.some(header => {
+                    const v = String(student._rawData?.[header] ?? student[header as keyof Student] ?? '');
+                    return v.toLowerCase().includes(term);
+                });
+            });
+        }
+
+        const total = filtered.length;
+        const pages = Math.max(1, Math.ceil(total / pageSize));
+        const page = Math.min(Math.max(1, currentPage), pages);
+        return { filteredStudents: filtered, clientPagination: { total, pages, page, limit: pageSize } };
+    }, [fileData?.students, search, filters, currentPage, pageSize, fileHeaders]);
+
+    const paginatedStudents = useMemo(() => {
+        const start = (clientPagination.page - 1) * pageSize;
+        return filteredStudents.slice(start, start + pageSize);
+    }, [filteredStudents, clientPagination.page, pageSize]);
+    // ─────────────────────────────────────────────────────────────────────────
 
     if (isLoading) {
         return (
@@ -232,7 +268,7 @@ const AdminFileView = () => {
         );
     }
 
-    const { file, students, pagination } = fileData;
+    const { file } = fileData;
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6 pt-24">
@@ -274,13 +310,16 @@ const AdminFileView = () => {
                                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                                     <Input
                                         placeholder="Search all fields..."
-                                        value={search}
-                                        onChange={(e) => setSearch(e.target.value)}
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
                                         className="pl-10"
                                     />
-                                    {search && (
+                                    {searchTerm && (
                                         <button
-                                            onClick={() => setSearch('')}
+                                            onClick={() => {
+                                                setSearchTerm('');
+                                                setSearch('');
+                                            }}
                                             className="absolute right-3 top-3 h-4 w-4 text-gray-400 hover:text-gray-600"
                                         >
                                             ×
@@ -333,7 +372,7 @@ const AdminFileView = () => {
                 <Card>
                     <CardHeader>
                         <div className="flex items-center justify-between">
-                            <CardTitle>Data ({pagination.total} records)</CardTitle>
+                            <CardTitle>Data ({clientPagination.total} records)</CardTitle>
                             <div className="flex items-center space-x-2">
                                 <Select
                                     value={pageSize.toString()}
@@ -365,7 +404,7 @@ const AdminFileView = () => {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {students.map((student, index) => (
+                                    {paginatedStudents.map((student, index) => (
                                         <TableRow key={student._id || index}>
                                             {file?.headers && file.headers.map(header => (
                                                 <TableCell key={header} className="whitespace-nowrap">
@@ -379,25 +418,25 @@ const AdminFileView = () => {
                         </div>
 
                         {/* Pagination */}
-                        {pagination.pages > 1 && (
+                        {clientPagination.pages > 1 && (
                             <div className="flex items-center justify-between mt-4">
                                 <div className="text-sm text-gray-500">
-                                    Page {pagination.page} of {pagination.pages}
+                                    Page {clientPagination.page} of {clientPagination.pages}
                                 </div>
                                 <div className="flex space-x-2">
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setCurrentPage(currentPage - 1)}
-                                        disabled={currentPage <= 1}
+                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                        disabled={clientPagination.page <= 1}
                                     >
                                         <ChevronLeft className="w-4 h-4" /> Previous
                                     </Button>
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setCurrentPage(currentPage + 1)}
-                                        disabled={currentPage >= pagination.pages}
+                                        onClick={() => setCurrentPage(prev => Math.min(clientPagination.pages, prev + 1))}
+                                        disabled={clientPagination.page >= clientPagination.pages}
                                     >
                                         Next <ChevronRight className="w-4 h-4" />
                                     </Button>
