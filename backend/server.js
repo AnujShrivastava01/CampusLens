@@ -86,10 +86,6 @@ const authMiddleware = (req, res, next) => {
   return ClerkExpressRequireAuth()(req, res, next);
 };
 
-// Routes with authentication
-app.use('/api/students', authMiddleware, studentRoutes);
-app.use('/api/upload', uploadRoutes); // Upload routes handle auth internally
-app.use('/api/admin', adminRoutes);
 
 // Add root route to fix "Route not found" error
 app.get('/', (req, res) => {
@@ -116,12 +112,9 @@ function maskMongoDBUri(uri) {
 }
 
 // MongoDB connection
-let isConnected = false;
-
 const connectDB = async () => {
   try {
-    if (isConnected) {
-      console.log('🔵 Using existing MongoDB connection');
+    if (mongoose.connection.readyState >= 1) {
       return mongoose.connection;
     }
     
@@ -191,7 +184,6 @@ const connectDB = async () => {
     console.log('⏳ Attempting to establish connection...');
 
     const conn = await mongoose.connect(process.env.MONGODB_URI, options);
-    isConnected = true;
 
     // Verify the connection by pinging the database
     await conn.connection.db.admin().ping();
@@ -230,6 +222,22 @@ const connectDB = async () => {
     throw error;
   }
 };
+
+// Middleware to ensure DB is connected before handling requests (Serverless optimization)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('Failed to connect to database in middleware:', error);
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
+
+// Routes with authentication
+app.use('/api/students', authMiddleware, studentRoutes);
+app.use('/api/upload', uploadRoutes); // Upload routes handle auth internally
+app.use('/api/admin', adminRoutes);
 
 // Connect to database with retry logic
 const MAX_RETRIES = 3;
@@ -529,9 +537,4 @@ if (process.env.VERCEL !== '1') {
     console.error('❌ Failed to connect to MongoDB:', err);
     process.exit(1);
   });
-} else {
-  // For Vercel, just ensure DB connection is initialized
-  connectDB().then(async () => {
-    await syncAdminCredentials();
-  }).catch(console.error);
 }
