@@ -223,26 +223,6 @@ const connectDB = async () => {
   }
 };
 
-// Middleware to ensure DB is connected before handling requests (Serverless optimization)
-app.use(async (req, res, next) => {
-  try {
-    await connectDB();
-    next();
-  } catch (error) {
-    console.error('Failed to connect to database in middleware:', error);
-    res.status(500).json({ error: 'Database connection failed' });
-  }
-});
-
-// Routes with authentication
-app.use('/api/students', authMiddleware, studentRoutes);
-app.use('/api/upload', uploadRoutes); // Upload routes handle auth internally
-app.use('/api/admin', adminRoutes);
-
-// Connect to database with retry logic
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 5000; // 5 seconds
-
 // Function to sync admin credentials from .env
 const syncAdminCredentials = async () => {
   try {
@@ -276,6 +256,32 @@ const syncAdminCredentials = async () => {
     console.error('❌ Failed to sync admin credentials:', error.message);
   }
 };
+
+let isAdminSynced = false;
+
+// Middleware to ensure DB is connected before handling requests (Serverless optimization)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    if (process.env.VERCEL === '1' && !isAdminSynced) {
+      syncAdminCredentials().catch(console.error);
+      isAdminSynced = true;
+    }
+    next();
+  } catch (error) {
+    console.error('Failed to connect to database in middleware:', error);
+    res.status(500).json({ error: 'Database connection failed' });
+  }
+});
+
+// Routes with authentication
+app.use('/api/students', authMiddleware, studentRoutes);
+app.use('/api/upload', uploadRoutes); // Upload routes handle auth internally
+app.use('/api/admin', adminRoutes);
+
+// Connect to database with retry logic
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 5000; // 5 seconds
 
 
 // Temporary: Bypass authentication for development testing
