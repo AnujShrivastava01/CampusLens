@@ -116,8 +116,15 @@ function maskMongoDBUri(uri) {
 }
 
 // MongoDB connection
+let isConnected = false;
+
 const connectDB = async () => {
   try {
+    if (isConnected) {
+      console.log('🔵 Using existing MongoDB connection');
+      return mongoose.connection;
+    }
+    
     console.log('🔵 Attempting to connect to MongoDB...');
 
     if (!process.env.MONGODB_URI) {
@@ -184,6 +191,7 @@ const connectDB = async () => {
     console.log('⏳ Attempting to establish connection...');
 
     const conn = await mongoose.connect(process.env.MONGODB_URI, options);
+    isConnected = true;
 
     // Verify the connection by pinging the database
     await conn.connection.db.admin().ping();
@@ -503,18 +511,27 @@ app.get('/api/debug/user/:userId', async (req, res) => {
   }
 });
 
-// Start server
-// Connect to MongoDB and start server
-connectDB().then(async () => {
-  // Sync admin credentials
-  await syncAdminCredentials();
+// Export app for Vercel
+export default app;
 
-  app.listen(PORT, () => {
-    console.log(`🚀 CampusLens API Server running on port ${PORT}`);
-    console.log(`📊 Environment: ${process.env.NODE_ENV}`);
-    console.log(`🌐 Client URL: ${process.env.CLIENT_URL}`);
+// Connect to MongoDB and start server (if not on Vercel)
+if (process.env.VERCEL !== '1') {
+  connectDB().then(async () => {
+    // Sync admin credentials
+    await syncAdminCredentials();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 CampusLens API Server running on port ${PORT}`);
+      console.log(`📊 Environment: ${process.env.NODE_ENV}`);
+      console.log(`🌐 Client URL: ${process.env.CLIENT_URL}`);
+    });
+  }).catch((err) => {
+    console.error('❌ Failed to connect to MongoDB:', err);
+    process.exit(1);
   });
-}).catch((err) => {
-  console.error('❌ Failed to connect to MongoDB:', err);
-  process.exit(1);
-});
+} else {
+  // For Vercel, just ensure DB connection is initialized
+  connectDB().then(async () => {
+    await syncAdminCredentials();
+  }).catch(console.error);
+}
