@@ -264,8 +264,10 @@ app.use(async (req, res, next) => {
   try {
     await connectDB();
     if (process.env.VERCEL === '1' && !isAdminSynced) {
-      syncAdminCredentials().catch(console.error);
+      console.log('⏳ Awaiting admin credentials sync on cold start...');
+      await syncAdminCredentials();
       isAdminSynced = true;
+      console.log('✅ Admin credentials sync complete.');
     }
     next();
   } catch (error) {
