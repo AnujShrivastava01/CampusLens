@@ -45,21 +45,31 @@ const protect = async (req, res, next) => {
 router.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
+    console.log(`[Admin Login Debug] Login attempt for username: '${username}'`);
     try {
         const admin = await Admin.findOne({ username });
+        console.log(`[Admin Login Debug] Admin found in DB:`, !!admin);
 
-        if (admin && (await admin.matchPassword(password))) {
-            res.json({
-                _id: admin._id,
-                username: admin.username,
-                token: jwt.sign({ id: admin._id, tokenVersion: admin.tokenVersion }, process.env.JWT_SECRET || 'fallback_secret_keep_it_safe', {
-                    expiresIn: '30d',
-                }),
-            });
-        } else {
-            res.status(401).json({ message: 'Invalid username or password' });
+        if (admin) {
+            const isMatch = await admin.matchPassword(password);
+            console.log(`[Admin Login Debug] Password match result:`, isMatch);
+            
+            if (isMatch) {
+                res.json({
+                    _id: admin._id,
+                    username: admin.username,
+                    token: jwt.sign({ id: admin._id, tokenVersion: admin.tokenVersion }, process.env.JWT_SECRET || 'fallback_secret_keep_it_safe', {
+                        expiresIn: '30d',
+                    }),
+                });
+                return;
+            }
         }
+        
+        console.log(`[Admin Login Debug] Returning 401 due to invalid credentials`);
+        res.status(401).json({ message: 'Invalid username or password' });
     } catch (error) {
+        console.error(`[Admin Login Debug] Error:`, error);
         res.status(500).json({ message: error.message });
     }
 });
